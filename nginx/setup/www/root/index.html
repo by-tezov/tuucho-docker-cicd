@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>server.tezov.com</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let url = window.location.href;
+            if (url.startsWith("http:")) {
+                document.title = "Server Offline";
+                document.body.innerHTML = "<h1>!!! SSL is not working !!!</h1>";
+            } else {
+                document.title = "Server Online with SSL";
+                document.body.innerHTML = "<h1>I'm alive and happy!</h1>";
+            }
+        });
+    </script>
+</head>
+<body>
+</body>
+</html>

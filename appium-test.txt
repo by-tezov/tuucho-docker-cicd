@@ -1,0 +1,6 @@
+{
+  "platformName": "Android",
+  "deviceName": "android-simulator-34:5001",
+  "automationName": "UiAutomator2",
+  "noReset": true
+}

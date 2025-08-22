@@ -1,0 +1,21 @@
+docker system prune -a
+docker ps
+docker network ls
+docker inspect <container_name>
+docker inspect -f '{{json .NetworkSettings.Ports}}' <container_name>
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_name>
+
+docker compose --profile <profile_name> up -d
+docker compose --profile <profile_name> down
+docker compose --profile <profile_name> down --volumes --rmi all (delete volume and network)
+
+Build
+--rm
+--no-cache
+--progress=plain
+
+docker build -t <image_name> <docker_file_path>
+docker network create <name>     
+docker exec -it -u <user> <container_name> bash 
+docker exec --privileged -it <container_name> bash -c "<script_file>"
+docker run -d --name <container_name> --network=<network_name> -p 8080:8080 -v <volume_name>:<path_in_container> <image_name>

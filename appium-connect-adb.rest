@@ -1,0 +1,11 @@
+@host = android-simulator-34-standalone
+@port = 5000
+
+POST http://localhost:4723/adb/connect 
+Accept: application/json; charset=utf-8
+Content-type: application/json; charset=utf-8
+
+{
+  "host": "{{host}}",
+  "port": "{{port}}"
+}

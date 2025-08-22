@@ -1,0 +1,188 @@
+services:
+  docker-host:
+    build:
+      context: ./
+      dockerfile: docker-host/Dockerfile
+    container_name: host
+    expose:
+      - 4777
+    networks:
+      - main-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    profiles:
+      - docker-host
+      - all
+      - start-auto
+
+  nginx:
+    build:
+      context: ./
+      dockerfile: nginx/Dockerfile
+    container_name: nginx
+    ports:
+      - 80:80
+      - 443:443
+    expose:
+      - 80
+      - 443
+    networks:
+      - main-network
+    volumes:
+      - nginx_letsencrypt_volume:/etc/nginx/letsencrypt/keys
+      - agent-android-builder_workspace_volume:/home/android/workspace:ro
+      - agent-android-qa_workspace_volume:/home/qa/workspace:ro
+    restart: unless-stopped
+    depends_on:
+      - jenkins
+    profiles:
+      - nginx
+      - all
+      - start-auto
+
+  jenkins:
+    build:
+      context: ./
+      dockerfile: jenkins/Dockerfile
+    container_name: jenkins
+    expose:
+      - 80
+    networks:
+      - main-network
+    volumes:
+      - jenkins_volume:/var/jenkins_home
+      - agent-android-builder_volume:/home/android:ro
+      - agent-android-qa_volume:/home/qa:ro
+    restart: unless-stopped
+    profiles:
+      - jenkins
+      - all
+      - start-auto
+
+  agent-android-builder:
+    build:
+      context: ./
+      dockerfile: agent-android-builder/Dockerfile
+    container_name: agent-android-builder
+    networks:
+      - main-network
+    volumes:
+      - agent-android-builder_volume:/home/android
+      - agent-android-builder_workspace_volume:/home/android/workspace
+    expose:
+      - 22
+    restart: unless-stopped
+    profiles:
+      - agent-android-builder
+      - all
+      - start-auto
+
+  agent-android-qa:
+    build:
+      context: ./
+      dockerfile: agent-android-qa/Dockerfile
+    container_name: agent-android-qa
+    networks:
+      - main-network
+    volumes:
+      - agent-android-qa_volume:/home/qa
+      - agent-android-qa_workspace_volume:/home/qa/workspace
+    environment:
+      - APPIUM_SERVICE=android-appium:4723
+    expose:
+      - 22
+    restart: unless-stopped
+    profiles:
+      - agent-android-qa
+      - all
+      - start-auto
+
+  android-appium:
+    build:
+      context: ./
+      dockerfile: android-appium/Dockerfile
+    container_name: android-appium
+    networks:
+      - main-network
+    volumes:
+      - agent-android-builder_workspace_volume:/home/android/workspace:ro
+    ports:
+      - 4723:4723
+    expose:
+      - 4723
+    restart: no
+    profiles:
+      - android-appium  
+      - all
+      - start-manual
+
+  android-simulator-34-fluxbox:
+    build:
+      context: ./
+      dockerfile: android-simulator-fluxbox/Dockerfile
+    container_name: android-simulator-34-fluxbox
+    networks:
+      - main-network
+    devices:
+      - /dev/kvm  
+    environment:
+      - ADB_SERVER_PORT=5000
+    ports:
+      - 5900:5900
+    expose:
+      - 5000
+    privileged: true
+    restart: no
+    profiles:
+      - android-simulator-34-fluxbox
+      - all
+      - start-manual
+
+  android-simulator-34-standalone:
+    # Need on each server restart to do xhost +local:docker to allow docker to connect to host display
+    build:
+      context: ./
+      dockerfile: android-simulator-standalone/Dockerfile
+    container_name: android-simulator-34-standalone
+    networks:
+      - main-network
+    volumes:
+      - /tmp/.X11-unix:/host-x11
+    devices:
+      - /dev/kvm  
+    environment:
+      - ADB_SERVER_PORT=5000
+      - DISPLAY=${DISPLAY}
+    expose:
+      - 5000
+    privileged: true
+    restart: no
+    profiles:
+      - android-simulator-34-standalone
+      - all
+      - start-manual
+
+networks:
+  main-network:
+    driver: bridge
+
+volumes:
+  nginx_letsencrypt_volume:
+    name: nginx_letsencrypt_volume
+    driver: local
+  jenkins_volume:
+    name: jenkins_volume
+    driver: local
+  agent-android-builder_volume:
+    name: agent-android-builder_volume
+    driver: local
+  agent-android-builder_workspace_volume:
+    name: agent-android-builder_workspace_volume
+    driver: local
+  agent-android-qa_volume:
+    name: agent-android-qa_volume
+    driver: local
+  agent-android-qa_workspace_volume:
+    name: agent-android-qa_workspace_volume
+    driver: local

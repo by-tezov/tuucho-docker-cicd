@@ -1,0 +1,20 @@
+{
+    "name": "appium-adb-plugin",
+    "version": "1.0.0",
+    "description": "Appium plugin to run adb connect commands",
+    "main": "index.js",
+    "keywords": [
+      "appium",
+      "plugin",
+      "adb"
+    ],
+    "author": "tezov",
+    "license": "Restricted",
+    "appium": {
+        "pluginName": "adb-plugin",
+        "mainClass": "AdbConnectPlugin"
+    },
+    "peerDependencies": {
+      "appium": "2.11.3"
+    }
+  }

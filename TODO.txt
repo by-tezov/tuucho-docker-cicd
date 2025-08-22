@@ -1,0 +1,7 @@
+# TODO Jenkins
+- add simulator,fix lock. add a qa-demo repository and validate all the pipeline
+- add ios pipeline build + test QA
+- + todo in code
+
+# TODO docker
+    - source all variable in single file to make it easier to setup somewhere else instead of fetching entrypoint by entrypoint
