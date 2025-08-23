@@ -2,9 +2,9 @@ FROM node:22-slim
 
 LABEL owner="tezov.app@gmail.com"
 
-ARG COMMAND_LINE_TOOL_VERSION=11076708
-ARG ANDROID_SDK_VERSION=android-35
-ARG BUILD_TOOLS_VERSION=34.0.0
+ARG COMMAND_LINE_TOOL_VERSION=13114758
+ARG ANDROID_SDK_VERSION=android-36
+ARG BUILD_TOOLS_VERSION=36.0.0
 
 USER root
 
@@ -20,7 +20,7 @@ ENV ANDROID_SDK=${ANDROID_HOME}
 ENV PATH=${PATH}:${JAVA_HOME}/bin:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}
 
 RUN apt-get update && apt-get install -y \
-    procps iputils-ping \
+    procps iputils-ping wget \
     openjdk-17-jdk curl unzip bash && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -28,26 +28,38 @@ RUN apt-get update && apt-get install -y \
 
 COPY setup/android/ ${ANDROID_HOME}/tmp/
 RUN set -eux; \
-    #cmdline-tools
-    mkdir -p ${ANDROID_HOME}/cmdline-tools/latest; \
-    cat ${ANDROID_HOME}/tmp/cmdline-tools/${COMMAND_LINE_TOOL_VERSION}/${COMMAND_LINE_TOOL_VERSION}.tar.part.* \
-      | tar -xzf - -C ${ANDROID_HOME}/cmdline-tools/latest --strip-components=1; \
-    #platform-tools
-    mkdir -p ${ANDROID_HOME}/platform-tools; \
-    cat ${ANDROID_HOME}/tmp/platform-tools/platform-tools.tar.part.* \
-      | tar -xz -C ${ANDROID_HOME}/platform-tools --strip-components=1; \
-    #build-tools
-    mkdir -p ${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}; \
-    cat ${ANDROID_HOME}/tmp/build-tools/${BUILD_TOOLS_VERSION}/${BUILD_TOOLS_VERSION}.tar.part.* \
-      | tar -xz -C ${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION} --strip-components=1; \
-    #platforms
-    mkdir -p ${ANDROID_HOME}/platforms/${ANDROID_SDK_VERSION}; \
-    cat ${ANDROID_HOME}/tmp/platforms/${ANDROID_SDK_VERSION}/${ANDROID_SDK_VERSION}.tar.part.* \
-      | tar -xz -C ${ANDROID_HOME}/platforms/${ANDROID_SDK_VERSION} --strip-components=1; \
-    #licenses
-    cp -r ${ANDROID_HOME}/tmp/licenses ${ANDROID_HOME}/licenses; \
-    #cleanup
-    rm -rf ${ANDROID_HOME}/tmp
+    if [ -d "${ANDROID_HOME}/tmp" ] && [ "$(ls -A ${ANDROID_HOME}/tmp)" ]; then \
+        #cmdline-tools
+        mkdir -p ${ANDROID_HOME}/cmdline-tools/latest; \
+        cat ${ANDROID_HOME}/tmp/cmdline-tools/${COMMAND_LINE_TOOL_VERSION}/${COMMAND_LINE_TOOL_VERSION}.tar.part.* \
+            | tar -xzf - -C ${ANDROID_HOME}/cmdline-tools/latest --strip-components=1; \
+        #platform-tools
+        mkdir -p ${ANDROID_HOME}/platform-tools; \
+        cat ${ANDROID_HOME}/tmp/platform-tools/platform-tools.tar.part.* \
+            | tar -xz -C ${ANDROID_HOME}/platform-tools --strip-components=1; \
+        #build-tools
+        mkdir -p ${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}; \
+        cat ${ANDROID_HOME}/tmp/build-tools/${BUILD_TOOLS_VERSION}/${BUILD_TOOLS_VERSION}.tar.part.* \
+            | tar -xz -C ${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION} --strip-components=1; \
+        #platforms
+        mkdir -p ${ANDROID_HOME}/platforms/${ANDROID_SDK_VERSION}; \
+        cat ${ANDROID_HOME}/tmp/platforms/${ANDROID_SDK_VERSION}/${ANDROID_SDK_VERSION}.tar.part.* \
+            | tar -xz -C ${ANDROID_HOME}/platforms/${ANDROID_SDK_VERSION} --strip-components=1; \
+        #licenses
+        cp -r ${ANDROID_HOME}/tmp/licenses ${ANDROID_HOME}/licenses; \
+        #cleanup
+        rm -rf ${ANDROID_HOME}/tmp; \
+    else \
+        wget https://dl.google.com/android/repository/commandlinetools-linux-${COMMAND_LINE_TOOL_VERSION}_latest.zip -O /tmp/cmdline-tools.zip; \
+        unzip /tmp/cmdline-tools.zip -d /tmp; \
+        mkdir -p ${ANDROID_HOME}/cmdline-tools/latest; \
+        mv /tmp/cmdline-tools/* ${ANDROID_HOME}/cmdline-tools/latest; \
+        rm /tmp/cmdline-tools.zip; \
+        yes | sdkmanager --licenses && sdkmanager \
+            "platform-tools" \
+            "build-tools;${BUILD_TOOLS_VERSION}" \
+            "platforms;${ANDROID_SDK_VERSION}"; \
+    fi
 
 RUN npm install -g appium@2.11.3
 RUN npm install -g appium-doctor@1.16.2

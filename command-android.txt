@@ -5,13 +5,8 @@ set -e
 LOCAL="Local/test"
 COMMAND_LINE_TOOL_VERSION=13114758
 ANDROID_SDK_VERSION="android-36"
-BUILD_TOOLS_VERSION="35.0.0"
-ANDROID_AVD_VERSION="android-35"
-
-#COMMAND_LINE_TOOL_VERSION=11076708
-#ANDROID_SDK_VERSION=android-35
-#BUILD_TOOLS_VERSION=34.0.0
-#ANDROID_AVD_VERSION=android-34
+BUILD_TOOLS_VERSION="36.0.0"
+ANDROID_AVD_VERSION="android-36"
 
 # Paths
 BASE_DIR="$HOME/$LOCAL"
@@ -30,17 +25,6 @@ exists() {
     [ -d "$1" ]
 }
 
-# Function to create tar split files
-tar_split() {
-    local src="$1"
-    local dest="$2"
-    if [ -d "$src" ]; then
-        echo "Creating split tar for $src..."
-        tar -czf - -C "$BASE_DIR" "$(basename "$src")" | split -b 30M - "$dest.tar.part"
-    else
-        echo "Directory $src does not exist. Skipping tar."
-    fi
-}
 
 # Download and setup cmdline-tools if not present
 if ! exists "$CMDLINE_TOOLS_DIR"; then
@@ -103,13 +87,7 @@ else
     echo "Android emulator already installed."
 fi
 
-# Create tar split files for all components
-tar_split "$CMDLINE_TOOLS_DIR" "$TAR_DIR/cmdline-tools"
-tar_split "$PLATFORM_TOOLS_DIR" "$TAR_DIR/platform-tools"
-tar_split "$BUILD_TOOLS_DIR" "$TAR_DIR/build-tools-$BUILD_TOOLS_VERSION"
-tar_split "$PLATFORMS_DIR" "$TAR_DIR/platforms-$ANDROID_SDK_VERSION"
-tar_split "$SYSTEM_IMAGES_DIR" "$TAR_DIR/system-images-$ANDROID_AVD_VERSION"
-tar_split "$EMULATOR_DIR" "$TAR_DIR/emulator"
 
-echo "Android SDK setup and tar split completed."
+# then create manually what you want predownload to build docjer image, need to todo this script
+# tar -czf - <source> | split -b 30M - <destination>.tar.part.
 

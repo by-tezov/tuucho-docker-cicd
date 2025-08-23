@@ -41,18 +41,20 @@ RUN chmod 700 ${ROOT_SSH} && \
 
 COPY setup/gradle/ ${GRADLE_HOME}/tmp/
 RUN set -eux; \
-    find ${GRADLE_HOME}/tmp -mindepth 2 -maxdepth 2 -type d | while read tmp_hash_folder; do \
-        final_dir="${GRADLE_HOME}/$(basename $(dirname ${tmp_hash_folder}))/$(basename ${tmp_hash_folder})"; \
-        mkdir -p "${final_dir}"; \
-        zip_file_name=$(ls "${tmp_hash_folder}" | head -n 1 | sed 's/.part.*$//'); \
-        tmp_tar_file="${tmp_hash_folder}/${zip_file_name}.tar.gz"; \
-        cat "${tmp_hash_folder}/${zip_file_name}".part.* > "${tmp_tar_file}"; \
-        tar -xzf "${tmp_tar_file}" -C "${tmp_hash_folder}"; \
-        unzip -q "${tmp_hash_folder}/${zip_file_name}" -d "${final_dir}"; \
-        touch "${final_dir}/${zip_file_name}.ok" "${final_dir}/${zip_file_name}.lck"; \
-    done \
-    && mv ${GRADLE_HOME}/tmp/CACHEDIR.TAG ${GRADLE_HOME}/ \
-    && rm -rf ${GRADLE_HOME}/tmp
+    if [ -d "${GRADLE_HOME}/tmp" ] && [ "$(ls -A ${GRADLE_HOME}/tmp)" ]; then \
+        find ${GRADLE_HOME}/tmp -mindepth 2 -maxdepth 2 -type d | while read tmp_hash_folder; do \
+            final_dir="${GRADLE_HOME}/$(basename $(dirname ${tmp_hash_folder}))/$(basename ${tmp_hash_folder})"; \
+            mkdir -p "${final_dir}"; \
+            zip_file_name=$(ls "${tmp_hash_folder}" | head -n 1 | sed 's/.part.*$//'); \
+            tmp_tar_file="${tmp_hash_folder}/${zip_file_name}.tar.gz"; \
+            cat "${tmp_hash_folder}/${zip_file_name}".part.* > "${tmp_tar_file}"; \
+            tar -xzf "${tmp_tar_file}" -C "${tmp_hash_folder}"; \
+            unzip -q "${tmp_hash_folder}/${zip_file_name}" -d "${final_dir}"; \
+            touch "${final_dir}/${zip_file_name}.ok" "${final_dir}/${zip_file_name}.lck"; \
+        done; \
+        mv ${GRADLE_HOME}/tmp/CACHEDIR.TAG ${GRADLE_HOME}/; \
+        rm -rf ${GRADLE_HOME}/tmp; \
+    fi
 
 RUN mkdir -p ${USER_HOME} && \
     chown -R root:root ${USER_HOME} && \

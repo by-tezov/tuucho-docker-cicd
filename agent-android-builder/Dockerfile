@@ -2,9 +2,9 @@ FROM openjdk:17-jdk-slim
 
 LABEL owner="tezov.app@gmail.com"
 
-ARG COMMAND_LINE_TOOL_VERSION=11076708
-ARG ANDROID_SDK_VERSION=android-35
-ARG BUILD_TOOLS_VERSION=34.0.0
+ARG COMMAND_LINE_TOOL_VERSION=13114758
+ARG ANDROID_SDK_VERSION=android-36
+ARG BUILD_TOOLS_VERSION=36.0.0
 
 USER root
 
@@ -25,32 +25,44 @@ RUN printf "JAVA_HOME=%s\nANDROID_HOME=%s\nANDROID_SDK_HOME=%s\nANDROID_SDK_ROOT
     >> /etc/environment
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping \
+    dos2unix procps iputils-ping wget \
     unzip git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY setup/android/ ${ANDROID_HOME}/tmp/
 RUN set -eux; \
-    #cmdline-tools
-    mkdir -p ${ANDROID_HOME}/cmdline-tools/latest; \
-    cat ${ANDROID_HOME}/tmp/cmdline-tools/${COMMAND_LINE_TOOL_VERSION}/${COMMAND_LINE_TOOL_VERSION}.tar.part.* \
-      | tar -xzf - -C ${ANDROID_HOME}/cmdline-tools/latest --strip-components=1; \
-    #platform-tools
-    mkdir -p ${ANDROID_HOME}/platform-tools; \
-    cat ${ANDROID_HOME}/tmp/platform-tools/platform-tools.tar.part.* \
-      | tar -xz -C ${ANDROID_HOME}/platform-tools --strip-components=1; \
-    #build-tools
-    mkdir -p ${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}; \
-    cat ${ANDROID_HOME}/tmp/build-tools/${BUILD_TOOLS_VERSION}/${BUILD_TOOLS_VERSION}.tar.part.* \
-      | tar -xz -C ${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION} --strip-components=1; \
-    #platforms
-    mkdir -p ${ANDROID_HOME}/platforms/${ANDROID_SDK_VERSION}; \
-    cat ${ANDROID_HOME}/tmp/platforms/${ANDROID_SDK_VERSION}/${ANDROID_SDK_VERSION}.tar.part.* \
-      | tar -xz -C ${ANDROID_HOME}/platforms/${ANDROID_SDK_VERSION} --strip-components=1; \
-    #licenses
-    cp -r ${ANDROID_HOME}/tmp/licenses ${ANDROID_HOME}/licenses; \
-    #cleanup
-    rm -rf ${ANDROID_HOME}/tmp
+    if [ -d "${ANDROID_HOME}/tmp" ] && [ "$(ls -A ${ANDROID_HOME}/tmp)" ]; then \
+        #cmdline-tools
+        mkdir -p ${ANDROID_HOME}/cmdline-tools/latest; \
+        cat ${ANDROID_HOME}/tmp/cmdline-tools/${COMMAND_LINE_TOOL_VERSION}/${COMMAND_LINE_TOOL_VERSION}.tar.part.* \
+            | tar -xzf - -C ${ANDROID_HOME}/cmdline-tools/latest --strip-components=1; \
+        #platform-tools
+        mkdir -p ${ANDROID_HOME}/platform-tools; \
+        cat ${ANDROID_HOME}/tmp/platform-tools/platform-tools.tar.part.* \
+            | tar -xz -C ${ANDROID_HOME}/platform-tools --strip-components=1; \
+        #build-tools
+        mkdir -p ${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}; \
+        cat ${ANDROID_HOME}/tmp/build-tools/${BUILD_TOOLS_VERSION}/${BUILD_TOOLS_VERSION}.tar.part.* \
+            | tar -xz -C ${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION} --strip-components=1; \
+        #platforms
+        mkdir -p ${ANDROID_HOME}/platforms/${ANDROID_SDK_VERSION}; \
+        cat ${ANDROID_HOME}/tmp/platforms/${ANDROID_SDK_VERSION}/${ANDROID_SDK_VERSION}.tar.part.* \
+            | tar -xz -C ${ANDROID_HOME}/platforms/${ANDROID_SDK_VERSION} --strip-components=1; \
+        #licenses
+        cp -r ${ANDROID_HOME}/tmp/licenses ${ANDROID_HOME}/licenses; \
+        #cleanup
+        rm -rf ${ANDROID_HOME}/tmp; \
+    else \
+        wget https://dl.google.com/android/repository/commandlinetools-linux-${COMMAND_LINE_TOOL_VERSION}_latest.zip -O /tmp/cmdline-tools.zip; \
+        unzip /tmp/cmdline-tools.zip -d /tmp; \
+        mkdir -p ${ANDROID_HOME}/cmdline-tools/latest; \
+        mv /tmp/cmdline-tools/* ${ANDROID_HOME}/cmdline-tools/latest; \
+        rm /tmp/cmdline-tools.zip; \
+        yes | sdkmanager --licenses && sdkmanager \
+            "platform-tools" \
+            "build-tools;${BUILD_TOOLS_VERSION}" \
+            "platforms;${ANDROID_SDK_VERSION}"; \
+    fi
 
 COPY setup/ssh/agent/id_rsa_agent.pub ${ROOT_SSH}/authorized_keys
 RUN chmod 600 ${ROOT_SSH}/authorized_keys
@@ -69,18 +81,20 @@ RUN chmod 700 ${ROOT_SSH} && \
 
 COPY setup/gradle/ ${GRADLE_HOME}/tmp/
 RUN set -eux; \
-    find ${GRADLE_HOME}/tmp -mindepth 2 -maxdepth 2 -type d | while read tmp_hash_folder; do \
-        final_dir="${GRADLE_HOME}/$(basename $(dirname ${tmp_hash_folder}))/$(basename ${tmp_hash_folder})"; \
-        mkdir -p "${final_dir}"; \
-        zip_file_name=$(ls "${tmp_hash_folder}" | head -n 1 | sed 's/.part.*$//'); \
-        tmp_tar_file="${tmp_hash_folder}/${zip_file_name}.tar.gz"; \
-        cat "${tmp_hash_folder}/${zip_file_name}".part.* > "${tmp_tar_file}"; \
-        tar -xzf "${tmp_tar_file}" -C "${tmp_hash_folder}"; \
-        unzip -q "${tmp_hash_folder}/${zip_file_name}" -d "${final_dir}"; \
-        touch "${final_dir}/${zip_file_name}.ok" "${final_dir}/${zip_file_name}.lck"; \
-    done \
-    && mv ${GRADLE_HOME}/tmp/CACHEDIR.TAG ${GRADLE_HOME}/ \
-    && rm -rf ${GRADLE_HOME}/tmp
+    if [ -d "${GRADLE_HOME}/tmp" ] && [ "$(ls -A ${GRADLE_HOME}/tmp)" ]; then \
+        find ${GRADLE_HOME}/tmp -mindepth 2 -maxdepth 2 -type d | while read tmp_hash_folder; do \
+            final_dir="${GRADLE_HOME}/$(basename $(dirname ${tmp_hash_folder}))/$(basename ${tmp_hash_folder})"; \
+            mkdir -p "${final_dir}"; \
+            zip_file_name=$(ls "${tmp_hash_folder}" | head -n 1 | sed 's/.part.*$//'); \
+            tmp_tar_file="${tmp_hash_folder}/${zip_file_name}.tar.gz"; \
+            cat "${tmp_hash_folder}/${zip_file_name}".part.* > "${tmp_tar_file}"; \
+            tar -xzf "${tmp_tar_file}" -C "${tmp_hash_folder}"; \
+            unzip -q "${tmp_hash_folder}/${zip_file_name}" -d "${final_dir}"; \
+            touch "${final_dir}/${zip_file_name}.ok" "${final_dir}/${zip_file_name}.lck"; \
+        done; \
+        mv ${GRADLE_HOME}/tmp/CACHEDIR.TAG ${GRADLE_HOME}/; \
+        rm -rf ${GRADLE_HOME}/tmp; \
+    fi
 
 RUN chown -R root:root ${USER_HOME} && \
     chown -R root:root ${ROOT_SSH}

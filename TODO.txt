@@ -1,10 +1,3 @@
-# TODO Jenkins
-- clean comment, remove all
-- github pending status
-- add cache (gradleW, npm) + npm ci
-
--> clean and close, ready for medium story
-
 # TODO docker
     - source all variable in single file to make it easier to setup somewhere else instead of fetching entrypoint by entrypoint
-    - add SDK 36, emulator 35
+    - buind simulator on demand by jenkins with parameters

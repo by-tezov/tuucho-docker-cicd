@@ -119,11 +119,11 @@ services:
       - all
       - start-manual
 
-  android-simulator-fluxbox-34:
+  android-simulator-fluxbox-36:
     build:
       context: ./
       dockerfile: android-simulator-fluxbox/Dockerfile
-    container_name: android-simulator-fluxbox-34
+    container_name: android-36.simulator.fluxbox
     networks:
       - main-network
     devices:
@@ -141,12 +141,12 @@ services:
       - all
       - start-manual
 
-  android-simulator-standalone-34:
+  android-simulator-standalone-36:
     # Need on each server restart to do xhost +local:docker to allow docker to connect to host display
     build:
       context: ./
       dockerfile: android-simulator-standalone/Dockerfile
-    container_name: android-simulator-standalone-34
+    container_name: android-36.simulator.standalone
     networks:
       - main-network
     volumes:
