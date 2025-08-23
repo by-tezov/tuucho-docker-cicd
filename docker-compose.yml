@@ -32,7 +32,7 @@ services:
     volumes:
       - nginx_letsencrypt_volume:/etc/nginx/letsencrypt/keys
       - agent-android-builder_workspace_volume:/home/android/workspace:ro
-      - agent-android-qa_workspace_volume:/home/qa/workspace:ro
+      - agent-android-qa_workspace_volume:/home/android-qa/workspace:ro #android-qa, else conflit if other qa (for ios)
     restart: unless-stopped
     depends_on:
       - jenkins
@@ -53,7 +53,7 @@ services:
     volumes:
       - jenkins_volume:/var/jenkins_home
       - agent-android-builder_volume:/home/android:ro
-      - agent-android-qa_volume:/home/qa:ro
+      - agent-android-qa_volume:/home/android-qa:ro
     restart: unless-stopped
     profiles:
       - jenkins
@@ -86,8 +86,8 @@ services:
     networks:
       - main-network
     volumes:
-      - agent-android-qa_volume:/home/qa
-      - agent-android-qa_workspace_volume:/home/qa/workspace
+      - agent-android-qa_volume:/home/android-qa
+      - agent-android-qa_workspace_volume:/home/android-qa/workspace
     environment:
       - APPIUM_SERVICE=android-appium:4723
     expose:
@@ -105,10 +105,12 @@ services:
     container_name: android-appium
     networks:
       - main-network
+    #network_mode: "host" #debug if you need to use appium on host and connect to host simulator
     volumes:
       - agent-android-builder_workspace_volume:/home/android/workspace:ro
     ports:
       - 4723:4723
+      #- 5554-5555:5554-5555 #debug
     expose:
       - 4723
     restart: no
@@ -117,11 +119,11 @@ services:
       - all
       - start-manual
 
-  android-simulator-34-fluxbox:
+  android-simulator-fluxbox-34:
     build:
       context: ./
       dockerfile: android-simulator-fluxbox/Dockerfile
-    container_name: android-simulator-34-fluxbox
+    container_name: android-simulator-fluxbox-34
     networks:
       - main-network
     devices:
@@ -135,16 +137,16 @@ services:
     privileged: true
     restart: no
     profiles:
-      - android-simulator-34-fluxbox
+      - android-simulator-fluxbox
       - all
       - start-manual
 
-  android-simulator-34-standalone:
+  android-simulator-standalone-34:
     # Need on each server restart to do xhost +local:docker to allow docker to connect to host display
     build:
       context: ./
       dockerfile: android-simulator-standalone/Dockerfile
-    container_name: android-simulator-34-standalone
+    container_name: android-simulator-standalone-34
     networks:
       - main-network
     volumes:
@@ -159,7 +161,7 @@ services:
     privileged: true
     restart: no
     profiles:
-      - android-simulator-34-standalone
+      - android-simulator-standalone
       - all
       - start-manual
 

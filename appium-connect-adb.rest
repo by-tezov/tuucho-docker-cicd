@@ -1,4 +1,4 @@
-@host = android-simulator-34-standalone
+@host = android-simulator-standalone-34
 @port = 5000
 
 POST http://localhost:4723/adb/connect 

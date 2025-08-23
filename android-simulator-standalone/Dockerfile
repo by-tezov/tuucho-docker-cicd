@@ -3,9 +3,10 @@ FROM openjdk:17-jdk-slim
 LABEL owner="tezov.app@gmail.com"
 
 ARG COMMAND_LINE_TOOL_VERSION=11076708
-ARG ANDROID_SDK_VERSION=35
+ARG ANDROID_SDK_VERSION=android-35
 ARG BUILD_TOOLS_VERSION=34.0.0
-ARG ANDROID_AVD_VERSION=34
+
+ARG ANDROID_AVD_VERSION=android-34
 ENV ANDROID_AVD_VERSION=${ANDROID_AVD_VERSION}
 
 USER root
@@ -35,7 +36,7 @@ RUN printf "export JAVA_HOME=%s\nexport ANDROID_HOME=%s\nexport ANDROID_SDK_HOME
 
 RUN apt-get update && apt-get install -y \
     dos2unix procps iputils-ping socat \
-    iproute2 net-tools sudo wget unzip bzip2 bash locales \
+    iproute2 net-tools sudo unzip bzip2 bash locales \
     wmctrl libpulse-dev libdrm-dev libxcb1 libxcb-render0 libxcb-shape0 libxcb-xfixes0 \
     libx11-xcb1 libxrender1 libxext6 libxi6 libxrandr2 libxcursor1 \
     libxdamage1 libxcomposite1 libgl1-mesa-glx libgl1-mesa-dri \
@@ -46,18 +47,36 @@ RUN apt-get update && apt-get install -y \
 
 RUN sed -i 's/^# *en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
 
-RUN wget https://dl.google.com/android/repository/commandlinetools-linux-${COMMAND_LINE_TOOL_VERSION}_latest.zip -O /tmp/cmdline-tools.zip && \
-    unzip /tmp/cmdline-tools.zip -d /tmp && \
-    mkdir -p ${ANDROID_HOME}/cmdline-tools/latest && mkdir -p ${ANDROID_AVD_HOME} && \
-    mv /tmp/cmdline-tools/* ${ANDROID_HOME}/cmdline-tools/latest && \
-    rm /tmp/cmdline-tools.zip
-
-RUN yes | sdkmanager --licenses && sdkmanager --no_https \
-    "platform-tools" \
-    "emulator" \
-    "build-tools;${BUILD_TOOLS_VERSION}" \
-    "platforms;android-${ANDROID_SDK_VERSION}" \
-    "system-images;android-${ANDROID_AVD_VERSION};google_apis;x86_64"
+COPY setup/android/ ${ANDROID_HOME}/tmp/
+RUN set -eux; \
+    #cmdline-tools
+    mkdir -p ${ANDROID_HOME}/cmdline-tools/latest; \
+    cat ${ANDROID_HOME}/tmp/cmdline-tools/${COMMAND_LINE_TOOL_VERSION}/${COMMAND_LINE_TOOL_VERSION}.tar.part.* \
+      | tar -xzf - -C ${ANDROID_HOME}/cmdline-tools/latest --strip-components=1; \
+    #platform-tools
+    mkdir -p ${ANDROID_HOME}/platform-tools; \
+    cat ${ANDROID_HOME}/tmp/platform-tools/platform-tools.tar.part.* \
+      | tar -xz -C ${ANDROID_HOME}/platform-tools --strip-components=1; \
+    #build-tools
+    mkdir -p ${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}; \
+    cat ${ANDROID_HOME}/tmp/build-tools/${BUILD_TOOLS_VERSION}/${BUILD_TOOLS_VERSION}.tar.part.* \
+      | tar -xz -C ${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION} --strip-components=1; \
+    #platforms
+    mkdir -p ${ANDROID_HOME}/platforms/${ANDROID_SDK_VERSION}; \
+    cat ${ANDROID_HOME}/tmp/platforms/${ANDROID_SDK_VERSION}/${ANDROID_SDK_VERSION}.tar.part.* \
+      | tar -xz -C ${ANDROID_HOME}/platforms/${ANDROID_SDK_VERSION} --strip-components=1; \
+    #system-images
+    mkdir -p ${ANDROID_HOME}/system-images/${ANDROID_AVD_VERSION}; \
+    cat ${ANDROID_HOME}/tmp/system-images/${ANDROID_AVD_VERSION}/${ANDROID_AVD_VERSION}.tar.part.* \
+      | tar -xz -C ${ANDROID_HOME}/system-images/${ANDROID_AVD_VERSION} --strip-components=1; \
+    #emulator
+    mkdir -p ${ANDROID_HOME}/emulator; \
+    cat ${ANDROID_HOME}/tmp/emulator/emulator.tar.part.* \
+      | tar -xz -C ${ANDROID_HOME}/emulator --strip-components=1; \
+    #licenses
+    cp -r ${ANDROID_HOME}/tmp/licenses ${ANDROID_HOME}/licenses; \
+    #cleanup
+    rm -rf ${ANDROID_HOME}/tmp
 
 RUN chown -R root:root ${USER_HOME}
 

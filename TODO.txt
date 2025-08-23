@@ -1,7 +1,10 @@
 # TODO Jenkins
-- add simulator,fix lock. add a qa-demo repository and validate all the pipeline
-- add ios pipeline build + test QA
-- + todo in code
+- clean comment, remove all
+- github pending status
+- add cache (gradleW, npm) + npm ci
+
+-> clean and close, ready for medium story
 
 # TODO docker
     - source all variable in single file to make it easier to setup somewhere else instead of fetching entrypoint by entrypoint
+    - add SDK 36, emulator 35

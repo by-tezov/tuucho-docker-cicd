@@ -3,3 +3,5 @@
 /nginx/setup/letsencrypt/certificats/
 /nginx/setup/letsencrypt/conf/
 /setup/ssh/
+/setup/android/
+/setup/gradle/
