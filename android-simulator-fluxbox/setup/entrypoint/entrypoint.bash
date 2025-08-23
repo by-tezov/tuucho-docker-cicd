@@ -11,10 +11,10 @@ IFS='x' read -r XVFB_RESOLUTION_WIDTH XVFB_RESOLUTION_HEIGHT _ <<< "$XVFB_RESOLU
 XVFB_TIMEOUT="${XVFB_TIMEOUT:-20}"
 FLUXBOX_TIMEOUT="${FLUXBOX_TIMEOUT:-20}"
 VNC_TIMEOUT="${VNC_TIMEOUT:-20}"
-EMULATOR_NAME="${EMULATOR_NAME:-emulator}"
-ANDROID_AVD_VERSION="${ANDROID_AVD_VERSION:-30}"
+EMULATOR_NAME="${EMULATOR_NAME:?EMULATOR_NAME is not set or empty}"
+ANDROID_AVD_VERSION="${ANDROID_AVD_VERSION:?ANDROID_AVD_VERSION is not set or empty}"
 EMULATOR_TIMEOUT="${EMULATOR_TIMEOUT:-120}"
-ADB_SERVER_PORT="${ADB_SERVER_PORT:-}"
+ADB_SERVER_PORT="${ADB_SERVER_PORT:?ADB_SERVER_PORT is not set or empty}"
 
 # === FUNCTIONS ===
 source /usr/local/bin/bash/function/log.bash
@@ -46,7 +46,7 @@ launch_vnc_server() {
 run_emulator() {
     log_info "Creating emulator"
     echo "no" | avdmanager create avd --force -n "$EMULATOR_NAME" \
-        -k "system-images;android-$ANDROID_AVD_VERSION;google_apis;x86_64" --device "pixel_3a"
+        -k "system-images;$ANDROID_AVD_VERSION;google_apis;x86_64" --device "pixel_3a"
 
     log_info "Starting emulator"
     exec emulator -avd "$EMULATOR_NAME" \

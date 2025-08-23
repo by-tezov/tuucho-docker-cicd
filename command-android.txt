@@ -1,0 +1,93 @@
+#!/bin/bash
+set -e
+
+# Configuration
+LOCAL="Local/test"
+COMMAND_LINE_TOOL_VERSION=13114758
+ANDROID_SDK_VERSION="android-36"
+BUILD_TOOLS_VERSION="36.0.0"
+ANDROID_AVD_VERSION="android-36"
+
+# Paths
+BASE_DIR="$HOME/$LOCAL"
+CMDLINE_TOOLS_DIR="$BASE_DIR/cmdline-tools/latest"
+PLATFORM_TOOLS_DIR="$BASE_DIR/platform-tools"
+BUILD_TOOLS_DIR="$BASE_DIR/build-tools/$BUILD_TOOLS_VERSION"
+PLATFORMS_DIR="$BASE_DIR/platforms/$ANDROID_SDK_VERSION"
+SYSTEM_IMAGES_DIR="$BASE_DIR/system-images/$ANDROID_AVD_VERSION"
+EMULATOR_DIR="$BASE_DIR/emulator"
+TAR_DIR="$BASE_DIR/tar"
+
+mkdir -p "$BASE_DIR" "$TAR_DIR"
+
+# Function to check if a directory exists
+exists() {
+    [ -d "$1" ]
+}
+
+
+# Download and setup cmdline-tools if not present
+if ! exists "$CMDLINE_TOOLS_DIR"; then
+    echo "cmdline-tools not found. Downloading..."
+    wget "https://dl.google.com/android/repository/commandlinetools-linux-${COMMAND_LINE_TOOL_VERSION}_latest.zip" -O "$BASE_DIR/cmdline-tools.zip"
+
+    mkdir -p "$BASE_DIR/cmdline-tools"
+    unzip "$BASE_DIR/cmdline-tools.zip" -d "$BASE_DIR/tmp-cmdline"
+    mkdir -p "$CMDLINE_TOOLS_DIR"
+    mv "$BASE_DIR/tmp-cmdline/cmdline-tools/"* "$CMDLINE_TOOLS_DIR"
+
+    rm -rf "$BASE_DIR/tmp-cmdline" "$BASE_DIR/cmdline-tools.zip"
+else
+    echo "cmdline-tools already installed."
+fi
+
+# Export PATH for sdkmanager
+export PATH="$CMDLINE_TOOLS_DIR/bin:$PATH"
+
+# Accept licenses
+yes | sdkmanager --licenses > /dev/null
+
+# Install platform-tools if not present
+if ! exists "$PLATFORM_TOOLS_DIR"; then
+    echo "Installing platform-tools..."
+    sdkmanager "platform-tools"
+else
+    echo "platform-tools already installed."
+fi
+
+# Install build-tools if not present
+if ! exists "$BUILD_TOOLS_DIR"; then
+    echo "Installing build-tools $BUILD_TOOLS_VERSION..."
+    sdkmanager "build-tools;$BUILD_TOOLS_VERSION"
+else
+    echo "build-tools $BUILD_TOOLS_VERSION already installed."
+fi
+
+# Install platforms if not present
+if ! exists "$PLATFORMS_DIR"; then
+    echo "Installing platform $ANDROID_SDK_VERSION..."
+    sdkmanager "platforms;$ANDROID_SDK_VERSION"
+else
+    echo "Platform $ANDROID_SDK_VERSION already installed."
+fi
+
+# Install system image if not present
+if ! exists "$SYSTEM_IMAGES_DIR"; then
+    echo "Installing system image $ANDROID_AVD_VERSION..."
+    sdkmanager "system-images;$ANDROID_AVD_VERSION;google_apis;x86_64"
+else
+    echo "System image $ANDROID_AVD_VERSION already installed."
+fi
+
+# Install emulator if not present
+if ! exists "$EMULATOR_DIR"; then
+    echo "Installing Android emulator..."
+    sdkmanager "emulator"
+else
+    echo "Android emulator already installed."
+fi
+
+
+# then create manually what you want predownload to build docjer image, need to todo this script
+# tar -czf - <source> | split -b 30M - <destination>.tar.part.
+

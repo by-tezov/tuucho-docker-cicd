@@ -17,11 +17,10 @@ RUN apt-get update && apt-get install -y \
     curl && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY jenkins/setup/backup ${JENKINS_HOME}/backup
-RUN cat ${JENKINS_HOME}/backup/jenkins.tar.part.* > ${JENKINS_HOME}/jenkins.tar.gz && \
-    tar -xzf ${JENKINS_HOME}/jenkins.tar.gz -C ${JENKINS_HOME}/ --strip-components=1 && \
-    rm -f ${JENKINS_HOME}/jenkins.tar.gz && \
-    rm -rf ${JENKINS_HOME}/backup
+COPY jenkins/setup/backup ${JENKINS_HOME}/tmp
+RUN cat ${JENKINS_HOME}/tmp/jenkins.tar.part.* > ${JENKINS_HOME}/tmp/jenkins.tar.gz && \
+    tar -xzf ${JENKINS_HOME}/tmp/jenkins.tar.gz -C ${JENKINS_HOME}/ --strip-components=1 && \
+    rm -rf ${JENKINS_HOME}/tmp
 
 COPY setup/ssh/github/id_ed25519_github ${JENKINS_SSH}/
 COPY setup/ssh/github/config ${JENKINS_SSH}/
@@ -39,5 +38,7 @@ RUN chown -R jenkins:jenkins ${USER_HOME} && \
     chown -R jenkins:jenkins ${JENKINS_HOME}
 
 USER jenkins
+RUN git config --global user.name "tezov.jenkins" && \
+    git config --global user.email "tezov.app@gmail.com"
 WORKDIR ${JENKINS_HOME}
 ENTRYPOINT ["/usr/local/bin/jenkins.sh"]
