@@ -3,5 +3,11 @@
 /nginx/setup/letsencrypt/certificats/
 /nginx/setup/letsencrypt/conf/
 /setup/ssh/
-/setup/android/
-/setup/gradle/
+!/setup/ssh/readme.md
+!/setup/ssh/agent/config
+!/setup/ssh/github/config
+!/setup/ssh/jenkins/config
+/setup/android/*
+!/setup/android/readme.md
+/setup/gradle/*
+!/setup/gradle/readme.md
