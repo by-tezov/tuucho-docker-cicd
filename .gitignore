@@ -1,5 +1,6 @@
 .idea
 /jenkins/setup/backup/
+/jenkins/setup/backup-old0/
 /nginx/setup/letsencrypt/certificats/
 /nginx/setup/letsencrypt/conf/
 /setup/ssh/

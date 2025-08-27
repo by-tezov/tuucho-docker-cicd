@@ -32,7 +32,7 @@ services:
     volumes:
       - nginx_letsencrypt_volume:/etc/nginx/letsencrypt/keys
       - agent-android-builder_workspace_volume:/home/android/workspace:ro
-      - agent-android-qa_workspace_volume:/home/android-qa/workspace:ro #android-qa, else conflit if other qa (for ios)
+      - agent-android-qa_workspace_volume:/home/android-qa/workspace:ro
     restart: unless-stopped
     depends_on:
       - jenkins
@@ -54,9 +54,27 @@ services:
       - jenkins_volume:/var/jenkins_home
       - agent-android-builder_volume:/home/android:ro
       - agent-android-qa_volume:/home/android-qa:ro
+      - /home/tezov/Local/tuucho/cicd/jenkins/setup/helper:/home/jenkins/helper:rw
     restart: unless-stopped
     profiles:
       - jenkins
+      - all
+      - start-auto
+
+  agent-repository:
+    build:
+      context: ./
+      dockerfile: agent-repository/Dockerfile
+    container_name: agent-repository
+    networks:
+      - main-network
+    volumes:
+      - agent-repository_volume:/home/repository
+    expose:
+      - 22
+    restart: unless-stopped
+    profiles:
+      - agent-repository
       - all
       - start-auto
 
@@ -123,7 +141,7 @@ services:
     build:
       context: ./
       dockerfile: android-simulator-fluxbox/Dockerfile
-    container_name: android-36.simulator.fluxbox
+    container_name: android-36-simulator-fluxbox
     networks:
       - main-network
     devices:
@@ -146,7 +164,7 @@ services:
     build:
       context: ./
       dockerfile: android-simulator-standalone/Dockerfile
-    container_name: android-36.simulator.standalone
+    container_name: android-36-simulator-standalone
     networks:
       - main-network
     volumes:
@@ -175,6 +193,9 @@ volumes:
     driver: local
   jenkins_volume:
     name: jenkins_volume
+    driver: local
+  agent-repository_volume:
+    name: agent-repository_volume
     driver: local
   agent-android-builder_volume:
     name: agent-android-builder_volume

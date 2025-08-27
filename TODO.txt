@@ -1,3 +1,6 @@
 # TODO docker
     - source all variable in single file to make it easier to setup somewhere else instead of fetching entrypoint by entrypoint
-    - buind simulator on demand by jenkins with parameters
+    - env variable system should come from docker env instead of duplicate conf (aka path builder env, +node path)
+    - todo that I would need artefact manager (JFrog ?) to serve appium apk/app, 
+        or report (possible also to make a container with volume and store artefact here ?)
+        or an agent with volume stash /unstash to transfer the files
