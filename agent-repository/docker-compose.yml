@@ -32,6 +32,8 @@ services:
     volumes:
       - nginx_letsencrypt_volume:/etc/nginx/letsencrypt/keys
       - agent-repository_volume:/home/repository:ro
+      - agent-android-builder_workspace_volume:/home/android/workspace:ro
+      - agent-android-qa_workspace_volume:/home/android-qa/workspace:ro
     restart: unless-stopped
     depends_on:
       - jenkins
@@ -51,7 +53,9 @@ services:
       - main-network
     volumes:
       - jenkins_volume:/var/jenkins_home
-      #- /home/tezov/Local/tuucho/cicd/jenkins/setup/helper:/home/jenkins/helper:rw
+      - agent-android-builder_volume:/home/android:ro
+      - agent-android-qa_volume:/home/android-qa:ro
+      - /home/tezov/Local/tuucho/cicd/jenkins/setup/helper:/home/jenkins/helper:rw
     restart: unless-stopped
     profiles:
       - jenkins
@@ -83,6 +87,7 @@ services:
     networks:
       - main-network
     volumes:
+      - agent-android-builder_volume:/home/android
       - agent-android-builder_workspace_volume:/home/android/workspace
     expose:
       - 22
@@ -100,6 +105,7 @@ services:
     networks:
       - main-network
     volumes:
+      - agent-android-qa_volume:/home/android-qa
       - agent-android-qa_workspace_volume:/home/android-qa/workspace
     environment:
       - APPIUM_SERVICE=android-appium:4723
@@ -190,8 +196,14 @@ volumes:
   agent-repository_volume:
     name: agent-repository_volume
     driver: local
+  agent-android-builder_volume:
+    name: agent-android-builder_volume
+    driver: local
   agent-android-builder_workspace_volume:
     name: agent-android-builder_workspace_volume
+    driver: local
+  agent-android-qa_volume:
+    name: agent-android-qa_volume
     driver: local
   agent-android-qa_workspace_volume:
     name: agent-android-qa_workspace_volume

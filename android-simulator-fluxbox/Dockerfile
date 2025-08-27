@@ -12,7 +12,7 @@ ENV ANDROID_AVD_VERSION=${ANDROID_AVD_VERSION}
 USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV EMULATOR_NAME=${ANDROID_AVD_VERSION}.simulator.fluxbox
+ENV EMULATOR_NAME=android-36-simulator-fluxbox
 
 ENV USER_HOME=/home/android
 ENV COMMAND_HOME=${USER_HOME}/command
@@ -35,7 +35,7 @@ RUN printf "export JAVA_HOME=%s\nexport ANDROID_HOME=%s\nexport ANDROID_SDK_HOME
     >> /etc/bash.bashrc
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping socat wget \
+    dos2unix procps iputils-ping socat wget tree \
     iproute2 net-tools sudo unzip bzip2 bash locales \
     libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libgl1-mesa-glx libegl1-mesa libnss3 libxcursor1 libpulse-dev libxshmfence-dev xdotool \
     xauth xvfb x11vnc fluxbox wmctrl libdbus-glib-1-2 && \

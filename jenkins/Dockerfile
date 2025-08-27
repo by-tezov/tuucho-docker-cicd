@@ -4,16 +4,17 @@ LABEL owner="tezov.app@gmail.com"
 
 USER root
 
+ENV JENKINS_OPTS="--httpPort=80 --prefix=/jenkins"
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
+
 ENV JENKINS_HOME=/var/jenkins_home
 ENV USER_HOME=/home/jenkins
+ENV JENKINS_HELPER_FILES=${USER_HOME}/helper
 ENV COMMAND_HOME=${USER_HOME}/command
 ENV JENKINS_SSH=${USER_HOME}/.ssh
 
-ENV JENKINS_OPTS="--httpPort=80 --prefix=/jenkins"
-
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping socat \
+    dos2unix procps iputils-ping socat tree \
     curl && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -33,6 +34,8 @@ RUN dos2unix ${COMMAND_HOME}/command_sender.bash && \
     chmod +x ${COMMAND_HOME}/command_sender.bash && \
     ln -s ${COMMAND_HOME}/command_sender.bash /usr/bin/docker && \
     chown jenkins:jenkins /usr/bin/docker
+
+COPY jenkins/setup/helper/ ${JENKINS_HELPER_FILES}/
 
 RUN chown -R jenkins:jenkins ${USER_HOME} && \ 
     chown -R jenkins:jenkins ${JENKINS_HOME}

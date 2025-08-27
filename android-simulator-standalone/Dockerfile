@@ -12,7 +12,7 @@ ENV ANDROID_AVD_VERSION=${ANDROID_AVD_VERSION}
 USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV EMULATOR_NAME=${ANDROID_AVD_VERSION}.simulator.standalone
+ENV EMULATOR_NAME=android-36-simulator-standalone
 
 ENV USER_HOME=/home/android
 ENV COMMAND_HOME=${USER_HOME}/command

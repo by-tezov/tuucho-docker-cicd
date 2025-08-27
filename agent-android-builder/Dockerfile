@@ -25,7 +25,7 @@ RUN printf "JAVA_HOME=%s\nANDROID_HOME=%s\nANDROID_SDK_HOME=%s\nANDROID_SDK_ROOT
     >> /etc/environment
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping wget \
+    dos2unix procps iputils-ping wget tree \
     unzip git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
