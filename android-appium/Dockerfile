@@ -20,7 +20,7 @@ ENV ANDROID_SDK=${ANDROID_HOME}
 ENV PATH=${PATH}:${JAVA_HOME}/bin:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}
 
 RUN apt-get update && apt-get install -y \
-    procps iputils-ping wget \
+    procps iputils-ping wget tree \
     openjdk-17-jdk curl unzip bash && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 

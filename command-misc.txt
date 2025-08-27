@@ -3,5 +3,7 @@ ssh-keygen -t rsa -b 4096 -f ~/Local/id_rsa_agent -C "_@_.com"
 
 openssl rand -hex 16
 
-tar -czf - <source> | split -b 30M - <destination>.tar.part. (need to split archive included repo to allow to push on github)
+tar -czf - <source> | split -b 30M - <destination>.tar.part.
 tar -xzf <source>.tar.gz -C <destination>
+
+ffmpeg -i input.flv -c copy output.mp4

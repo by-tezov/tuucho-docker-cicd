@@ -10,7 +10,7 @@ ENV VAR_WWW=/var/www
 ENV VAR_WWW_ROOT=${VAR_WWW}/root
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping socat net-tools iproute2 \
+    dos2unix procps iputils-ping socat net-tools iproute2 tree \
     python3 python3-pip python3-venv cron && \
     python3 -m venv /opt/certbot-venv && \
     /opt/certbot-venv/bin/pip install --no-cache-dir certbot && \
