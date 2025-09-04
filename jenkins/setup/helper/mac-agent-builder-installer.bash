@@ -21,6 +21,12 @@ ZSHRC="${BUILDER_HOME}/.zshrc"
 [ -f "${ZSHRC}" ] && rm "${ZSHRC}"
 touch "${ZSHRC}"
 
+cat >> "${ZSHRC}" <<EOF
+LANG=en_US.UTF-8
+LANGUAGE=en_US:en
+LC_ALL=en_US.UTF-8
+EOF
+
 # Homebrew
 if [ ! -d "${_BREW_HOME}" ]; then
     echo "Installing Homebrew..."
@@ -105,7 +111,7 @@ fi
 # Ruby
 if ! brew list "ruby@${RUBY_VERSION}" &>/dev/null; then
     echo "Installing Ruby ${RUBY_VERSION}..."
-    brew install "ruby@${RUBY_VERSION}" --build-from-source || true
+    brew install "ruby@${RUBY_VERSION}" || true
 fi
 
 _RUBY_HOME="$(brew --prefix "ruby@${RUBY_VERSION}")"
