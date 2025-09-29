@@ -17,9 +17,9 @@ RUN printf "export JAVA_HOME=%s\nexport PATH=%s\n" \
     >> /etc/environment
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping socat wget jq tree \
-    openjdk-17-jdk wget unzip git bash openssh-server openssh-client \
-    curl jq && \
+    dos2unix procps iputils-ping socat tree \
+    openjdk-17-jdk wget curl jq \
+    unzip zip git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 #RUN echo "Java path: $(readlink -f $(which java))"

@@ -1,3 +1,6 @@
+
+- NEED to test and add the ios publication agent
+
 # TODO docker
     - source all variable in single file to make it easier to setup somewhere else instead of fetching entrypoint by entrypoint
     - env variable system should come from docker env instead of duplicate conf (aka path builder env, +node path), mayeb a way to inject them in jenkins ?

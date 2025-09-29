@@ -12,8 +12,9 @@ ENV PATH=${PATH}:${JAVA_HOME}/bin
 RUN printf "JAVA_HOME=%s\nPATH=%s\n" "$JAVA_HOME" "$PATH" >> /etc/environment
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping wget tree \
-    unzip git bash openssh-server openssh-client && \
+    dos2unix procps iputils-ping tree \
+    wget curl jq \
+    unzip zip git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY setup/ssh/agent/id_rsa_agent.pub ${ROOT_SSH}/authorized_keys

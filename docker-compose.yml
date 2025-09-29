@@ -120,8 +120,6 @@ services:
       - main-network
     volumes:
       - agent-android-builder_workspace_volume:/home/android/workspace:ro
-    ports:
-      - 4723:4723
     expose:
       - 4723
     restart: no
