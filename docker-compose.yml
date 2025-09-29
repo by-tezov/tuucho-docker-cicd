@@ -176,6 +176,21 @@ services:
       - all
       - start-manual
 
+  backend-tuucho:
+    build:
+      context: ./
+      dockerfile: backend-tuucho/Dockerfile
+    container_name: backend-tuucho
+    networks:
+      - main-network
+    expose:
+      - 3000
+    restart: unless-stopped
+    profiles:
+      - backend
+      - all
+      - start-auto
+
 networks:
   main-network:
     driver: bridge
