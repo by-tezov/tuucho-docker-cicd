@@ -13,7 +13,7 @@ clone_and_install() {
     log_info "Cloning and installing repo"
     mkdir -p "$USER_HOME/$REPO_DIR"
     git clone --branch "$BRANCH" "$REPO_URL" "$USER_HOME/$REPO_DIR"
-    cd "$HOME/$REPO_DIR"
+    cd "$USER_HOME/$REPO_DIR"
     npm ci
 }
 
