@@ -60,12 +60,6 @@ RUN mkdir -p ${USER_HOME} && \
     chown -R root:root ${USER_HOME} && \
     chown -R root:root ${ROOT_SSH}
 
-COPY docker-host/setup/command/command_sender.bash ${COMMAND_HOME}/
-RUN dos2unix ${COMMAND_HOME}/command_sender.bash && \
-    chmod +x ${COMMAND_HOME}/command_sender.bash && \
-    ln -s ${COMMAND_HOME}/command_sender.bash /usr/bin/docker && \
-    chown root:root /usr/bin/docker
-
 #IMPORT LOG FUNCTION
 COPY setup/bash/function/log.bash /usr/local/bin/bash/function/
 RUN dos2unix /usr/local/bin/bash/function/log.bash

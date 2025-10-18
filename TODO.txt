@@ -1,7 +1,9 @@
-RUN git config --system user.email "tezov.app@gmail.com" && \
-git config --system user.name "tezov.jenkins"
-
-backend container with branch on the fly
+- backend auto delete container if inactive
+- add global config here and remove hack on jenkins clone_and_merge
+    RUN git config --system user.email "tezov.app@gmail.com" && \
+    git config --system user.name "tezov.jenkins"
+- script auto save volumes jenkins
+- update portainer
 
 # TODO docker
     - source all variable in single file to make it easier to setup somewhere else instead of fetching entrypoint by entrypoint

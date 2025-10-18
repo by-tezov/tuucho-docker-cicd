@@ -14,6 +14,6 @@ if [ -z "$APPIUM_SERVICE" ]; then
   exit 1
 fi
 
-socat TCP-LISTEN:4723,reuseaddr,fork,bind=127.0.0.1 TCP:${APPIUM_SERVICE} > /home/qa/socat.log 2>&1 &
+socat TCP-LISTEN:4723,reuseaddr,fork,bind=127.0.0.1 TCP:${APPIUM_SERVICE} > /home/android-qa/socat.log 2>&1 &
 
 exec /usr/sbin/sshd -D

@@ -178,16 +178,10 @@ services:
     build:
       context: ./
       dockerfile: backend-tuucho/Dockerfile
-    container_name: backend-tuucho
-    networks:
-      - main-network
-    expose:
-      - 3000
-    restart: unless-stopped
+    image: backend-tuucho:latest
     profiles:
-      - backend
+      - backend-tuucho
       - all
-      - start-auto
 
 networks:
   main-network:

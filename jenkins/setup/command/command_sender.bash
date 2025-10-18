@@ -1,7 +1,7 @@
 #!/bin/bash
 
 command_docker_host() {
-    echo "docker $@" | socat - TCP:docker-host:4777 || { echo "false"; }
+    echo "docker $@" | socat - TCP:docker-host:4777 || { echo "false result='fail to send command'"; }
 }
 
 command_ready() {
@@ -11,7 +11,7 @@ command_ready() {
 
 parse_command() {
     case "$1" in
-        start|stop)
+        start|stop|create-and-start|stop-and-delete)
             command_docker_host "$@"
             ;;
         status)
@@ -19,12 +19,11 @@ parse_command() {
             command_ready "$@"
             ;;
         *)
-            exit 1
+            echo "false result='unknown command for command_send.bash'";
             ;;
     esac
     exit 0
 }
-
 
 if [ $# -eq 0 ] && [ ! -t 0 ]; then
     set -- $(cat)
