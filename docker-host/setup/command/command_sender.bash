@@ -1,7 +1,7 @@
 #!/bin/bash
 
 command_docker_host() {
-    echo "docker $@" | socat - TCP:docker-host:4777 || { echo "false"; }
+    echo "docker $@" | socat - TCP:docker-host:4777 || { echo "false result='fail to send command'"; }
 }
 
 command_ready() {

@@ -4,7 +4,10 @@
 HOST_IP=$(hostname -i)
 REPO_DIR="remote"
 REPO_URL="git@github.com:by-tezov/tuucho-backend.git"
-BRANCH="master"
+if [ -z "$BRANCH" ]; then
+    echo "error: BRANCH environment variable is required"
+    exit 1
+fi
 
 # === FUNCTIONS ===
 source /usr/local/bin/bash/function/log.bash

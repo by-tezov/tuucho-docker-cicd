@@ -10,6 +10,7 @@ services:
       - main-network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-host/setup/command/command_receiver_docker.bash:/root/command/command_receiver_docker.bash:rw
     restart: unless-stopped
     profiles:
       - docker-host
@@ -32,6 +33,7 @@ services:
     volumes:
       - nginx_letsencrypt_volume:/etc/nginx/letsencrypt/keys
       - agent-repository_volume:/home/repository:ro
+      #- ./nginx/setup/nginx/site-enabled:/etc/nginx/site-enabled:rw
     restart: unless-stopped
     depends_on:
       - jenkins
@@ -51,6 +53,7 @@ services:
       - main-network
     volumes:
       - jenkins_volume:/var/jenkins_home
+      - ./docker-host/setup/command/command_sender.bash:/home/jenkins/command/command_sender.bash:rw
       #- /home/tezov/Local/tuucho/cicd/jenkins/setup/helper:/home/jenkins/helper:rw
     restart: unless-stopped
     profiles:
@@ -178,16 +181,10 @@ services:
     build:
       context: ./
       dockerfile: backend-tuucho/Dockerfile
-    container_name: backend-tuucho
-    networks:
-      - main-network
-    expose:
-      - 3000
-    restart: unless-stopped
+    image: backend-tuucho:latest
     profiles:
-      - backend
+      - backend-tuucho
       - all
-      - start-auto
 
 networks:
   main-network:
