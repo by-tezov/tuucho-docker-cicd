@@ -29,7 +29,7 @@ RUN chmod 700 ${JENKINS_SSH} && \
     chmod 600 ${JENKINS_SSH}/id_ed25519_github && \
     ln -s ${JENKINS_SSH} ${JENKINS_HOME}/.ssh
 
-COPY docker-host/setup/command/command_sender.bash ${COMMAND_HOME}/
+COPY jenkins/setup/command/command_sender.bash ${COMMAND_HOME}/
 RUN dos2unix ${COMMAND_HOME}/command_sender.bash && \
     chmod +x ${COMMAND_HOME}/command_sender.bash && \
     ln -s ${COMMAND_HOME}/command_sender.bash /usr/bin/docker && \

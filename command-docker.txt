@@ -5,9 +5,19 @@ docker inspect <container_name>
 docker inspect -f '{{json .NetworkSettings.Ports}}' <container_name>
 docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_name>
 
-docker compose --profile <profile_name> up -d
-docker compose --profile <profile_name> down
-docker compose --profile <profile_name> down --volumes --rmi all (delete volume and network)
+docker compose build \
+  backend-tuucho \
+  android-appium \
+  android-simulator-fluxbox-36 \
+  android-simulator-standalone-36 \
+&& docker compose create \
+  android-appium \
+  android-simulator-fluxbox-36 \
+  android-simulator-standalone-36 \
+&& docker compose --profile start-auto up -d
+
+docker compose --profile all down
+docker compose --profile all down --volumes --rmi all (delete volume and network)
 
 Build
 --rm

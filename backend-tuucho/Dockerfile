@@ -5,6 +5,7 @@ LABEL owner="tezov.app@gmail.com"
 USER root
 
 ENV USER_HOME=/home/backend
+ENV COMMAND_HOME=${USER_HOME}/command
 ENV ROOT_SSH=/root/.ssh
 
 RUN apt-get update && apt-get install -y \
@@ -22,9 +23,22 @@ RUN mkdir -p ${USER_HOME} && \
     chown -R root:root ${USER_HOME} && \
     chown -R root:root ${ROOT_SSH}
 
+COPY docker-host/setup/command/command_receiver_ready.bash ${COMMAND_HOME}/
+RUN dos2unix ${COMMAND_HOME}/command_receiver_ready.bash && \
+    chmod +x ${COMMAND_HOME}/command_receiver_ready.bash
+
 #IMPORT LOG FUNCTION
 COPY setup/bash/function/log.bash /usr/local/bin/bash/function/
 RUN dos2unix /usr/local/bin/bash/function/log.bash
+#IMPORT GET VALUE FUNCTION
+COPY setup/bash/function/get_key_value.bash /usr/local/bin/bash/function/
+RUN dos2unix /usr/local/bin/bash/function/get_key_value.bash
+#IMPORT SET VALUE FUNCTION
+COPY setup/bash/function/set_key_value.bash /usr/local/bin/bash/function/
+RUN dos2unix /usr/local/bin/bash/function/set_key_value.bash
+#IMPORT WAIT_UNTIL FUNCTION
+COPY setup/bash/function/wait_until.bash /usr/local/bin/bash/function/
+RUN dos2unix /usr/local/bin/bash/function/wait_until.bash
 
 COPY backend-tuucho/setup/entrypoint/ /usr/local/bin/
 RUN dos2unix /usr/local/bin/entrypoint.bash && \

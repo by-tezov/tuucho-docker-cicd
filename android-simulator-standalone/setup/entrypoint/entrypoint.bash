@@ -3,11 +3,11 @@
 # === CONFIGURATION ===
 source /usr/local/bin/keys.bash
 HOST_IP=$(hostname -i)
-LOG_DIR="$HOME/log"
-EMULATOR_NAME="${EMULATOR_NAME:?EMULATOR_NAME is not set or empty}"
-ANDROID_AVD_VERSION="${ANDROID_AVD_VERSION:?ANDROID_AVD_VERSION is not set or empty}"
+#LOG_DIR="$HOME/log"
+: "${EMULATOR_NAME:?EMULATOR_NAME is not set or empty}"
+: "${ANDROID_AVD_VERSION:?ANDROID_AVD_VERSION is not set or empty}"
 EMULATOR_TIMEOUT="${EMULATOR_TIMEOUT:-300}"
-ADB_SERVER_PORT="${ADB_SERVER_PORT:?ADB_SERVER_PORT is not set or empty}"
+: "${ADB_SERVER_PORT:?ADB_SERVER_PORT is not set or empty}"
 
 # === FUNCTIONS ===
 source /usr/local/bin/bash/function/log.bash
@@ -25,6 +25,7 @@ run_emulator() {
         -gpu swiftshader_indirect -memory 2048 -netdelay none -netspeed full \
         -grpc-use-token -port 5554 &
     emulator_pid=$!
+    trap "kill $emulator_pid 2>/dev/null" EXIT
 
     wait_until "adb -s emulator-5554 shell getprop dev.bootcomplete | grep -m 1 '1'" "$EMULATOR_TIMEOUT" "Emulator failed to boot."
     sleep 5
