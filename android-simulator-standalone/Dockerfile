@@ -102,9 +102,6 @@ RUN dos2unix ${COMMAND_HOME}/command_receiver_ready.bash && \
 #IMPORT LOG FUNCTION
 COPY setup/bash/function/log.bash /usr/local/bin/bash/function/
 RUN dos2unix /usr/local/bin/bash/function/log.bash
-#IMPORT GET VALUE FUNCTION
-COPY setup/bash/function/get_key_value.bash /usr/local/bin/bash/function/
-RUN dos2unix /usr/local/bin/bash/function/get_key_value.bash
 #IMPORT SET VALUE FUNCTION
 COPY setup/bash/function/set_key_value.bash /usr/local/bin/bash/function/
 RUN dos2unix /usr/local/bin/bash/function/set_key_value.bash

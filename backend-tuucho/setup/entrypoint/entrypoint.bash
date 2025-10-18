@@ -2,12 +2,12 @@
 
 # === CONFIGURATION ===
 HOST_IP=$(hostname -i)
+LOG_DIR="$HOME/log"
 REPO_DIR="remote"
 REPO_URL="git@github.com:by-tezov/tuucho-backend.git"
-if [ -z "$BRANCH" ]; then
-    echo "error: BRANCH environment variable is required"
-    exit 1
-fi
+: "${BRANCH:?BRANCH is not set or empty}"
+NESTJS_TIMEOUT="${NESTJS_TIMEOUT:-300}"
+set_key_value "$COMMAND_RESPONSE_READY_KEY" "false"
 
 # === FUNCTIONS ===
 source /usr/local/bin/bash/function/log.bash
@@ -18,6 +18,21 @@ clone_and_install() {
     git clone --branch "$BRANCH" "$REPO_URL" "$USER_HOME/$REPO_DIR"
     cd "$USER_HOME/$REPO_DIR"
     npm ci
+}
+
+setup_receiver_socat() {
+    log_info "Setup receiver"
+    socat TCP-LISTEN:4777,reuseaddr,fork,bind="${HOST_IP}" EXEC:"${COMMAND_HOME}/command_receiver_ready.bash" > "$LOG_DIR/x11_socat.log" 2>&1 &
+}
+
+start_nestjs() {
+    log_info "Starting NestJS app"
+    npm run start:dev &
+    nestjs_pid=$!
+    trap "kill $nestjs_pid 2>/dev/null" EXIT
+    log_info "Waiting NestJS"
+    HEALTH_REGEX="\"health\"[[:space:]]*:[[:space:]]*\"[[:space:]]*[0-9]+%[[:space:]]*\""
+    wait_until "curl -sf http://localhost:3000/health/lobby | grep -Eq '$HEALTH_REGEX'" "$NESTJS_TIMEOUT" "NestJS failed to start"
 }
 
 # === MAIN ===
@@ -39,5 +54,8 @@ else
     fi
 fi
 
-log_info "Starting app"
-npm run start:dev
+setup_receiver_socat
+start_nestjs
+
+set_key_value "$COMMAND_RESPONSE_READY_KEY" "true"
+wait "$nestjs_pid"
