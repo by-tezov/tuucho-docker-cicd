@@ -3,21 +3,25 @@ set -e
 
 #CICD_FOLDER need to add this with ssh environment
 
-BUILDER_HOME="${HOME}/${CICD_FOLDER}/builder"
-_BREW_HOME="${BUILDER_HOME}/library/brew"
-_ANDROID_HOME="${BUILDER_HOME}/library/android"
+BUILDER_HOME=${HOME}/${CICD_FOLDER}/builder
 
-BREW_VERSION="4.6.7"
-JAVA_VERSION="17"
-
+_ANDROID_HOME=${BUILDER_HOME}/library/android
 COMMAND_LINE_TOOL_VERSION=13114758
-BUILD_TOOLS_VERSION="36.0.0"
-ANDROID_SDK_VERSION="android-36"
+BUILD_TOOLS_VERSION=36.0.0
+ANDROID_SDK_VERSION=android-36
 
-XCODE_VERSION="16.4"
-RUBY_VERSION="3.3"
+_JAVA_HOME=${BUILDER_HOME}/library/java
+JAVA_VERSION=17
+JAVA_JDK_URL=https://download.java.net/java/GA/jdk${JAVA_VERSION}.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-${JAVA_VERSION}.0.2_macos-aarch64_bin.tar.gz
 
-ZSHRC="${BUILDER_HOME}/.zshrc"
+_BREW_HOME=${BUILDER_HOME}/library/brew
+BREW_VERSION=4.6.7
+BREW_GIT_URL=https://github.com/Homebrew/brew.git
+
+RUBY_VERSION=3.3
+XCODE_VERSION=26.0.1
+
+ZSHRC=${BUILDER_HOME}/.zshrc
 [ -f "${ZSHRC}" ] && rm "${ZSHRC}"
 touch "${ZSHRC}"
 
@@ -26,32 +30,6 @@ LANG=en_US.UTF-8
 LANGUAGE=en_US:en
 LC_ALL=en_US.UTF-8
 EOF
-
-# Homebrew
-if [ ! -d "${_BREW_HOME}" ]; then
-    echo "Installing Homebrew..."
-    mkdir -p "${_BREW_HOME}"
-    git clone --depth 1 https://github.com/Homebrew/brew.git "${_BREW_HOME}"
-    git -C "${_BREW_HOME}" fetch --tags --depth 1 --quiet
-    git -C "${_BREW_HOME}" -c advice.detachedHead=false checkout "refs/tags/${BREW_VERSION}"
-fi
-
-cat >> "${ZSHRC}" <<EOF
-BREW_HOME=${_BREW_HOME}
-NONINTERACTIVE=1
-HOMEBREW_PREFIX=\${BREW_HOME}
-HOMEBREW_CELLAR=\${BREW_HOME}/Cellar
-HOMEBREW_REPOSITORY=\${BREW_HOME}/Library/Homebrew
-HOMEBREW_CACHE=\${BREW_HOME}/cache
-HOMEBREW_TEMP=\${BREW_HOME}/tmp
-HOMEBREW_CASK_OPTS=\${BREW_HOME}/Applications
-HOMEBREW_NO_ENV_HINTS=1
-HOMEBREW_NO_AUTO_UPDATE=1
-HOMEBREW_DEVELOPER=1
-PATH=\${BREW_HOME}/bin:\${BREW_HOME}/sbin:\$PATH
-EOF
-source "${ZSHRC}"
-brew --version
 
 # Android Command Line Tools
 if [ ! -d "${_ANDROID_HOME}/cmdline-tools/latest" ]; then
@@ -69,9 +47,9 @@ fi
 
 cat >> "${ZSHRC}" <<EOF
 ANDROID_HOME=${_ANDROID_HOME}
-ANDROID_SDK_HOME=${_ANDROID_HOME}
-ANDROID_SDK_ROOT=${_ANDROID_HOME}
-ANDROID_SDK=${_ANDROID_HOME}
+ANDROID_SDK_HOME=\${_ANDROID_HOME}
+ANDROID_SDK_ROOT=\${_ANDROID_HOME}
+ANDROID_SDK=\${_ANDROID_HOME}
 PATH=\${ANDROID_HOME}/cmdline-tools/latest/bin:\${ANDROID_HOME}/platform-tools:\${ANDROID_HOME}/tools:\${ANDROID_HOME}/tools/bin:\$PATH
 PATH=${_ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}:\$PATH
 EOF
@@ -79,14 +57,18 @@ source "${ZSHRC}"
 sdkmanager --list_installed
 
 # Java
-if ! brew list --formula | grep -q "^openjdk@${JAVA_VERSION}\$"; then
-    echo "Installing OpenJDK ${JAVA_VERSION}"
-    brew install openjdk@${JAVA_VERSION} || true
+if [ ! -d "${_JAVA_HOME}/Contents" ]; then
+    echo "Installing Java from ${JAVA_JDK_URL}"
+    mkdir -p "${_JAVA_HOME}"
+    TMPDIR=$(mktemp -d)
+    curl -fsSL "${JAVA_JDK_URL}" -o "${TMPDIR}/openjdk.tar.gz"
+    tar -xzf "${TMPDIR}/openjdk.tar.gz" -C "${TMPDIR}"
+    mv "${TMPDIR}"/jdk-17*/* "${_JAVA_HOME}/"
+    rm -rf "${TMPDIR}"
 fi
 
-_JAVA_HOME="$(brew --prefix openjdk@${JAVA_VERSION})"
 cat >> "${ZSHRC}" <<EOF
-JAVA_HOME=${_JAVA_HOME}
+JAVA_HOME=${_JAVA_HOME}/Contents/Home
 PATH=\${JAVA_HOME}/bin:\$PATH
 EOF
 source "${ZSHRC}"
@@ -107,6 +89,32 @@ if [ ${#needs_install[@]} -gt 0 ]; then
         sdkmanager "${comp}"
     done
 fi
+
+# Homebrew
+if [ ! -d "${_BREW_HOME}/bin" ]; then
+    echo "Installing Homebrew..."
+    mkdir -p "${_BREW_HOME}"
+    git clone --depth 1 "${BREW_GIT_URL}" "${_BREW_HOME}"
+    git -C "${_BREW_HOME}" fetch --tags --depth 1 --quiet
+    git -C "${_BREW_HOME}" -c advice.detachedHead=false checkout "refs/tags/${BREW_VERSION}"
+fi
+
+cat >> "${ZSHRC}" <<EOF
+BREW_HOME=${_BREW_HOME}
+NONINTERACTIVE=1
+HOMEBREW_PREFIX=\${BREW_HOME}
+HOMEBREW_CELLAR=\${BREW_HOME}/Cellar
+HOMEBREW_REPOSITORY=\${BREW_HOME}/Library/Homebrew
+HOMEBREW_CACHE=\${BREW_HOME}/cache
+HOMEBREW_TEMP=\${BREW_HOME}/tmp
+HOMEBREW_CASK_OPTS=\${BREW_HOME}/Applications
+HOMEBREW_NO_ENV_HINTS=1
+HOMEBREW_NO_AUTO_UPDATE=1
+HOMEBREW_DEVELOPER=1
+PATH=\${BREW_HOME}/bin:\${BREW_HOME}/sbin:\$PATH
+EOF
+source "${ZSHRC}"
+brew --version
 
 # Ruby
 if ! brew list "ruby@${RUBY_VERSION}" &>/dev/null; then
@@ -149,7 +157,6 @@ source "${ZSHRC}"
 xcodebuild -version
 
 if ! command -v xcversion &>/dev/null; then
-    echo "Installing Xcversion..."
     gem install xcode-install
 fi
 echo "xcversion $(xcversion --version)"
@@ -158,8 +165,8 @@ if [[ "$(xcodebuild -version | head -n1 | awk '{print $2}')" != "${XCODE_VERSION
     if ! "${_XCVERSION_PATH}" installed | awk '{print $1}' | grep -qx "${XCODE_VERSION}"; then
         echo "Xcode ${XCODE_VERSION} is not installed. Attempting installation..."
         xcversion install "${XCODE_VERSION}" || {
-            # Can work because it ask to developper account credential
-            # Add a container with volume that contain pre download xcode.xib
+            # Can not work because it ask developper account credential
+            # Add a container with volume that contain pre download xcode.xib ???
             echo "Failed to install Xcode ${XCODE_VERSION}." 
             exit 1
         }

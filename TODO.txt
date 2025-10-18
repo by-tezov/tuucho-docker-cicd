@@ -1,3 +1,7 @@
+RUN git config --system user.email "tezov.app@gmail.com" && \
+git config --system user.name "tezov.jenkins"
+
+backend container with branch on the fly
 
 # TODO docker
     - source all variable in single file to make it easier to setup somewhere else instead of fetching entrypoint by entrypoint
