@@ -18,11 +18,11 @@ ENV ANDROID_SDK_HOME=${ANDROID_HOME}
 ENV ANDROID_SDK_ROOT=${ANDROID_HOME}
 ENV ANDROID_SDK=${ANDROID_HOME}
 
-ENV PATH=${PATH}:${JAVA_HOME}/bin:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}
+ENV PATH=${PATH}:${JAVA_HOME}/bin:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:\
+${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}
 
 RUN printf "JAVA_HOME=%s\nANDROID_HOME=%s\nANDROID_SDK_HOME=%s\nANDROID_SDK_ROOT=%s\nANDROID_SDK=%s\nPATH=%s\n" \
-    "$JAVA_HOME" "$ANDROID_HOME" "$ANDROID_SDK_HOME" "$ANDROID_SDK_ROOT" "$ANDROID_SDK" "$PATH" \
-    >> /etc/environment
+"$JAVA_HOME" "$ANDROID_HOME" "$ANDROID_SDK_HOME" "$ANDROID_SDK_ROOT" "$ANDROID_SDK" "$PATH" >> /etc/environment
 
 RUN apt-get update && apt-get install -y \
     dos2unix procps iputils-ping tree \
