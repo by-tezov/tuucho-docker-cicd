@@ -10,7 +10,7 @@ JAVA_VERSION=17
 JAVA_JDK_URL=https://download.java.net/java/GA/jdk${JAVA_VERSION}.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-${JAVA_VERSION}.0.2_macos-aarch64_bin.tar.gz
 
 _NODE_HOME=${BUILDER_HOME}/library/node
-NODE_VERSION=22.18.0
+NODE_VERSION=22.21.1
 NODE_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-darwin-arm64.tar.gz
 
 APPIUM_VERSION=2.11.3

@@ -92,6 +92,23 @@ services:
       - all
       - start-auto
 
+  agent-android-danger:
+    build:
+      context: ./
+      dockerfile: agent-android-danger/Dockerfile
+    container_name: agent-android-danger
+    networks:
+      - main-network
+    volumes:
+      - agent-android-danger_workspace_volume:/home/android-danger/workspace
+    expose:
+      - 22
+    restart: unless-stopped
+    profiles:
+      - agent-android-danger
+      - all
+      - start-auto    
+
   agent-android-qa:
     build:
       context: ./
@@ -199,6 +216,9 @@ volumes:
     driver: local
   agent-android-builder_workspace_volume:
     name: agent-android-builder_workspace_volume
+    driver: local
+  agent-android-danger_workspace_volume:
+    name: agent-android-danger_workspace_volume
     driver: local
   agent-android-qa_workspace_volume:
     name: agent-android-qa_workspace_volume
