@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:21-jdk
 
 LABEL owner="tezov.app@gmail.com"
 
@@ -13,7 +13,7 @@ ENV USER_HOME=/home/android-danger
 ENV ROOT_SSH=/root/.ssh
 
 ENV GRADLE_HOME=/root/.gradle/wrapper/dists
-ENV JAVA_HOME=/usr/local/openjdk-17
+ENV JAVA_HOME=/opt/java/openjdk
 
 ENV PATH=${PATH}:${JAVA_HOME}/bin:/usr/local/danger-kotlin/bin:/usr/local/node/bin:/usr/local/kotlinc/bin
 
