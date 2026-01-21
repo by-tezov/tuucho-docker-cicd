@@ -9,7 +9,7 @@ ARG DANGER_KOTLIN_VERSION=1.3.3
 
 USER root
 
-ENV USER_HOME=/home/android-danger
+ENV USER_HOME=/home/linux
 ENV ROOT_SSH=/root/.ssh
 
 ENV GRADLE_HOME=/root/.gradle/wrapper/dists
@@ -25,6 +25,9 @@ RUN apt-get update && apt-get install -y \
     wget curl jq \
     unzip zip xz-utils git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN git config --global user.email "tezov.app@gmail.com" && \
+    git config --global user.name "tezov jenkins"
 
 RUN set -eux; \
     curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" -o /tmp/node.tar.xz; \
@@ -92,7 +95,7 @@ RUN mkdir -p ${USER_HOME} && \
 COPY setup/bash/function/log.bash /usr/local/bin/bash/function/
 RUN dos2unix /usr/local/bin/bash/function/log.bash
 
-COPY agent-android-danger/setup/entrypoint/ /usr/local/bin/
+COPY agent-linux/setup/entrypoint/ /usr/local/bin/
 RUN dos2unix /usr/local/bin/entrypoint.bash && \
     chmod +x /usr/local/bin/entrypoint.bash
 

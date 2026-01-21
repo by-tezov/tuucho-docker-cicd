@@ -111,6 +111,7 @@ PATH=\${BREW_HOME}/bin:\${BREW_HOME}/sbin:\$PATH
 EOF
 source "${ZSHRC}"
 brew --version
+brew update-reset
 
 # Appium required
 if ! brew tap | grep -q "^wix/brew\$"; then

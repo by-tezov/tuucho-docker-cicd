@@ -4,6 +4,6 @@ ssh-keygen -t rsa -b 4096 -f ~/Local/id_rsa_agent -C "_@_.com"
 openssl rand -hex 16
 
 tar -czf - _data | split -b 30M - jenkins.tar.part.
-tar -xzf <source>.tar.gz -C <destination>
+cat .tar.part.* | tar -xzf -
 
 ffmpeg -i input.flv -c copy output.mp4

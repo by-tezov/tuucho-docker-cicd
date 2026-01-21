@@ -3,7 +3,7 @@ set -e
 
 #CICD_FOLDER need to add this with ssh environment
 
-BUILDER_HOME=${HOME}/${CICD_FOLDER}/builder
+BUILDER_HOME=${HOME}/${CICD_FOLDER}/mac-os
 
 _ANDROID_HOME=${BUILDER_HOME}/library/android
 COMMAND_LINE_TOOL_VERSION=14742923

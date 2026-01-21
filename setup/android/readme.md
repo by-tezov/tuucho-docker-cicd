@@ -11,3 +11,5 @@ In this folder you can add your android tools, images, etc... pre-downloaded to 
     - android-xx
 - systems-images
     - android-xx
+    
+You can use the script command-android.bash that will download and generate the folders
