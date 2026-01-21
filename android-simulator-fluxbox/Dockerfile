@@ -2,9 +2,9 @@ FROM openjdk:17.0.1-jdk-slim
 
 LABEL owner="tezov.app@gmail.com"
 
-ARG COMMAND_LINE_TOOL_VERSION=13114758
+ARG COMMAND_LINE_TOOL_VERSION=14742923
 ARG ANDROID_SDK_VERSION=android-36
-ARG BUILD_TOOLS_VERSION=36.0.0
+ARG BUILD_TOOLS_VERSION=36.1.0
 
 ARG ANDROID_AVD_VERSION=android-36
 ENV ANDROID_AVD_VERSION=${ANDROID_AVD_VERSION}
@@ -83,8 +83,8 @@ RUN set -eux; \
         mkdir -p ${ANDROID_AVD_HOME}; \
         yes | sdkmanager --licenses && sdkmanager \
             "platform-tools" \
-            "emulator" \
             "build-tools;${BUILD_TOOLS_VERSION}" \
+            "emulator" \
             "platforms;${ANDROID_SDK_VERSION}" \
             "system-images;${ANDROID_AVD_VERSION};google_apis;x86_64"; \
     fi

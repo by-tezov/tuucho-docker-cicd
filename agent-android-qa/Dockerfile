@@ -16,6 +16,9 @@ RUN apt-get update && apt-get install -y \
     unzip zip git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN git config --global user.email "tezov.app@gmail.com" && \
+    git config --global user.name "tezov jenkins"
+
 COPY setup/ssh/agent/id_rsa_agent.pub ${ROOT_SSH}/authorized_keys
 RUN chmod 600 ${ROOT_SSH}/authorized_keys
 

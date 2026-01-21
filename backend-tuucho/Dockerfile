@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y \
     unzip zip git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN git config --global user.email "tezov.app@gmail.com" && \
+    git config --global user.name "tezov jenkins"
+
 COPY setup/ssh/github/id_ed25519_github ${ROOT_SSH}/
 COPY setup/ssh/github/config ${ROOT_SSH}/
 RUN chmod 700 ${ROOT_SSH} && \

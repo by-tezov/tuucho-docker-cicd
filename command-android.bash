@@ -2,10 +2,10 @@
 set -e
 
 # Configuration
-LOCAL="Local/test"
-COMMAND_LINE_TOOL_VERSION=13114758
+LOCAL="Local/cicd-predownload"
+COMMAND_LINE_TOOL_VERSION=14742923
 ANDROID_SDK_VERSION="android-36"
-BUILD_TOOLS_VERSION="36.0.0"
+BUILD_TOOLS_VERSION="36.1.0"
 ANDROID_AVD_VERSION="android-36"
 
 # Paths
@@ -63,6 +63,14 @@ else
     echo "build-tools $BUILD_TOOLS_VERSION already installed."
 fi
 
+# Install emulator if not present
+if ! exists "$EMULATOR_DIR"; then
+    echo "Installing Android emulator..."
+    sdkmanager "emulator"
+else
+    echo "Android emulator already installed."
+fi
+
 # Install platforms if not present
 if ! exists "$PLATFORMS_DIR"; then
     echo "Installing platform $ANDROID_SDK_VERSION..."
@@ -79,15 +87,56 @@ else
     echo "System image $ANDROID_AVD_VERSION already installed."
 fi
 
-# Install emulator if not present
-if ! exists "$EMULATOR_DIR"; then
-    echo "Installing Android emulator..."
-    sdkmanager "emulator"
-else
-    echo "Android emulator already installed."
-fi
+SETUP_DIR="$BASE_DIR/_setup-android-tar"
+CHUNK_SIZE="30M"
+
+mkdir -p "$SETUP_DIR"
+
+bundle_dir() {
+    local SRC_DIR="$1"
+    local OUT_NAME="$2"
+    local REL_PATH="$3"
+
+    local DEST_DIR
+    if [ "$REL_PATH" = "." ]; then
+        DEST_DIR="$SETUP_DIR"
+    elif [ "$REL_PATH" = "$OUT_NAME" ]; then
+        DEST_DIR="$SETUP_DIR/$REL_PATH"
+    else
+        DEST_DIR="$SETUP_DIR/$REL_PATH/$OUT_NAME"
+    fi
+
+    mkdir -p "$DEST_DIR"
+    echo "Bundling $SRC_DIR -> $DEST_DIR/${OUT_NAME}.tar.part.*"
+
+    (
+        cd "$SRC_DIR" || exit 1
+        tar -czf - . | split -b "$CHUNK_SIZE" - "$DEST_DIR/${OUT_NAME}.tar.part."
+    )
+}
+
+# build-tools
+bundle_dir "$BUILD_TOOLS_DIR" "$BUILD_TOOLS_VERSION" "build-tools"
+
+# cmdline-tools
+bundle_dir "$CMDLINE_TOOLS_DIR" "$COMMAND_LINE_TOOL_VERSION" "cmdline-tools"
+
+# emulator
+bundle_dir "$EMULATOR_DIR" "emulator" "emulator"
+
+# licenses
+echo "Copying licenses..."
+cp -a "$BASE_DIR/licenses" "$SETUP_DIR/"
+
+# platform-tools
+bundle_dir "$PLATFORM_TOOLS_DIR" "platform-tools" "platform-tools"
+
+# platforms
+bundle_dir "$PLATFORMS_DIR" "$ANDROID_SDK_VERSION" "platforms"
+
+# system-images
+bundle_dir "$SYSTEM_IMAGES_DIR" "$ANDROID_AVD_VERSION" "system-images"
 
 
-# then create manually what you want predownload to build docjer image, need to todo this script
-# tar -czf - <source> | split -b 30M - <destination>.tar.part.
-
+# for gradle, should do a script too. Can be take inside .gradle/wrapper
+#zip -r - gradle-9.0.0-bin | split -b 30M - gradle-9.0.0-bin.zip.part.

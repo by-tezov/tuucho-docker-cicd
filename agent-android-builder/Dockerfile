@@ -1,10 +1,10 @@
-FROM openjdk:17-jdk-slim
+FROM openjdk:17.0.1-jdk-slim
 
 LABEL owner="tezov.app@gmail.com"
 
-ARG COMMAND_LINE_TOOL_VERSION=13114758
+ARG COMMAND_LINE_TOOL_VERSION=14742923
 ARG ANDROID_SDK_VERSION=android-36
-ARG BUILD_TOOLS_VERSION=36.0.0
+ARG BUILD_TOOLS_VERSION=36.1.0
 
 USER root
 
@@ -29,6 +29,9 @@ RUN apt-get update && apt-get install -y \
     wget curl jq \
     unzip zip git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN git config --global user.email "tezov.app@gmail.com" && \
+    git config --global user.name "tezov jenkins"
 
 COPY setup/android/ ${ANDROID_HOME}/tmp/
 RUN set -eux; \
