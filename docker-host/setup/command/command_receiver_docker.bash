@@ -36,8 +36,7 @@ command_docker_create_and_start() {
 
 command_docker_stop_and_delete() {
     local container="$1"
-    docker stop "$container" > /dev/null 2>&1 || true
-    docker rm "$container" > /dev/null 2>&1 || true
+    docker rm -f "$container" > /dev/null 2>&1 || true
 }
 
 command_docker() {

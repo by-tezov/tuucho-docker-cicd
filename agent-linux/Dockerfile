@@ -69,22 +69,8 @@ COPY setup/ssh/github/config ${ROOT_SSH}/
 RUN chmod 700 ${ROOT_SSH} && \
     chmod 600 ${ROOT_SSH}/id_ed25519_github
 
-COPY setup/gradle/ ${GRADLE_HOME}/tmp/
-RUN set -eux; \
-    if [ -d "${GRADLE_HOME}/tmp" ] && [ "$(ls -A ${GRADLE_HOME}/tmp)" ]; then \
-        find ${GRADLE_HOME}/tmp -mindepth 2 -maxdepth 2 -type d | while read tmp_hash_folder; do \
-            final_dir="${GRADLE_HOME}/$(basename $(dirname ${tmp_hash_folder}))/$(basename ${tmp_hash_folder})"; \
-            mkdir -p "${final_dir}"; \
-            zip_file_name=$(ls "${tmp_hash_folder}" | head -n 1 | sed 's/.part.*$//'); \
-            tmp_tar_file="${tmp_hash_folder}/${zip_file_name}.tar.gz"; \
-            cat "${tmp_hash_folder}/${zip_file_name}".part.* > "${tmp_tar_file}"; \
-            tar -xzf "${tmp_tar_file}" -C "${tmp_hash_folder}"; \
-            unzip -q "${tmp_hash_folder}/${zip_file_name}" -d "${final_dir}"; \
-            touch "${final_dir}/${zip_file_name}.ok" "${final_dir}/${zip_file_name}.lck"; \
-        done; \
-        mv ${GRADLE_HOME}/tmp/CACHEDIR.TAG ${GRADLE_HOME}/; \
-        rm -rf ${GRADLE_HOME}/tmp; \
-    fi
+# TODO pre download gradle dists and put them inside GRADLE_HOME
+# I remove my previous attempt since it was too messy
 
 RUN mkdir -p ${USER_HOME} && \
     chown -R root:root ${USER_HOME} && \

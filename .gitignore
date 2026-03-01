@@ -12,6 +12,3 @@
 /setup/android/*
 !/setup/android/
 !/setup/android/readme.md
-/setup/gradle/*
-!/setup/gradle/
-!/setup/gradle/readme.md

@@ -1,6 +1,4 @@
-- backend auto delete container if inactive
 - script pour gradle setup download and create archive (example miss 9.0.0 wrapper)
-- remove unused container (backend always failed to be removed ...)
 
 # TODO docker
     - source all variable in single file to make it easier to setup somewhere else instead of fetching entrypoint by entrypoint
@@ -8,6 +6,6 @@
     - todo agent-repository for (report, apk, app, ipa, git clone...)
 
 # one day todo
-- emulator android on the fly
 - multiple suite build variant allowed
-- appium should always be running to allow concurrent e2e test
+- emulator android on the fly (+self destruction)
+- appium running and stop with ARC logic instead of always start/stop
