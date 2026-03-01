@@ -7,7 +7,6 @@ ANDROID_SDK_VERSION="android-36"
 BUILD_TOOLS_VERSION=36.1.0
 ANDROID_AVD_VERSION="android-36"
 
-#TEMP_DIR="/home/tezov/Local/by-tezov/cicd/setup/android-tmp"
 TEMP_DIR=$(mktemp -d)
 DESTINATION_FOLDER_PATH="/home/tezov/Local/by-tezov/cicd/setup/android"
 
