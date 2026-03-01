@@ -17,7 +17,7 @@ docker compose build \
 && docker compose --profile start-auto up -d
 
 docker compose --profile all down
-docker compose --profile all down --volumes --rmi all (delete volume and network)
+docker compose --profile all down --volumes --rmi all
 
 Build
 --rm
@@ -26,6 +26,8 @@ Build
 
 docker build -t <image_name> <docker_file_path>
 docker network create <name>     
-docker exec -it -u <user> <container_name> bash 
 docker exec --privileged -it <container_name> bash -c "<script_file>"
 docker run -d --name <container_name> --network=<network_name> -p 8080:8080 -v <volume_name>:<path_in_container> <image_name>
+
+docker exec -it -u <user> <container_name> bash 
+

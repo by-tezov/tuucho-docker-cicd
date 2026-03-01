@@ -36,7 +36,7 @@ RUN printf "export JAVA_HOME=%s\nexport ANDROID_HOME=%s\nexport ANDROID_SDK_HOME
 
 RUN apt-get update && apt-get install -y \
     dos2unix procps iputils-ping socat \
-    iproute2 net-tools sudo unzip bzip2 bash locales wget \
+    iproute2 net-tools sudo unzip zip bzip2 bash locales wget \
     wmctrl libpulse-dev libdrm-dev libxcb1 libxcb-render0 libxcb-shape0 libxcb-xfixes0 \
     libx11-xcb1 libxrender1 libxext6 libxi6 libxrandr2 libxcursor1 \
     libxdamage1 libxcomposite1 libgl1-mesa-glx libgl1-mesa-dri \
@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN sed -i 's/^# *en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
 
-COPY setup/android/ ${ANDROID_HOME}/tmp/
+COPY setup/android/last/ ${ANDROID_HOME}/tmp/
 RUN set -eux; \
     if [ -d "${ANDROID_HOME}/tmp" ] && [ "$(ls -A ${ANDROID_HOME}/tmp)" ]; then \
       #cmdline-tools

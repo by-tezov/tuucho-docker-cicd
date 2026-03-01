@@ -11,8 +11,8 @@ ENV ROOT_SSH=/root/.ssh
 ENV GRADLE_HOME=/root/.gradle/wrapper/dists
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping socat tree \
-    openjdk-17-jdk wget curl jq \
+    dos2unix procps iputils-ping socat tree wget curl jq \
+    openjdk-17-jdk \
     unzip zip git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 

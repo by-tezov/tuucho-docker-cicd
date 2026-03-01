@@ -1,9 +1,16 @@
+# ssl
 ssh-keygen -t ed25519 -f ~/Local/id_ed25519-github -C "_@_.com"
 ssh-keygen -t rsa -b 4096 -f ~/Local/id_rsa_agent -C "_@_.com"
-
 openssl rand -hex 16
 
+# tar and split
 tar -czf - _data | split -b 30M - jenkins.tar.part.
 cat .tar.part.* | tar -xzf -
 
+# video convert
 ffmpeg -i input.flv -c copy output.mp4
+
+# jenkins backup
+sudo -i
+cd /home/tezov/Local/by-tezov/cicd
+bash command-jenkins-backup.bash

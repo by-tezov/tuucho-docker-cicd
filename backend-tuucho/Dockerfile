@@ -9,8 +9,7 @@ ENV COMMAND_HOME=${USER_HOME}/command
 ENV ROOT_SSH=/root/.ssh
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping socat tree \
-    wget curl jq \
+    dos2unix procps iputils-ping socat tree wget curl jq \
     unzip zip git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 

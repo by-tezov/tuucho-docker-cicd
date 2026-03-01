@@ -25,15 +25,14 @@ RUN printf "JAVA_HOME=%s\nANDROID_HOME=%s\nANDROID_SDK_HOME=%s\nANDROID_SDK_ROOT
 "$JAVA_HOME" "$ANDROID_HOME" "$ANDROID_SDK_HOME" "$ANDROID_SDK_ROOT" "$ANDROID_SDK" "$PATH" >> /etc/environment
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping tree \
-    wget curl jq \
-    unzip zip git bash openssh-server openssh-client && \
+    dos2unix procps iputils-ping tree wget curl jq \
+    unzip zip git bash openssh-server openssh-client rsync && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN git config --global user.email "tezov.app@gmail.com" && \
     git config --global user.name "tezov jenkins"
 
-COPY setup/android/ ${ANDROID_HOME}/tmp/
+COPY setup/android/last/ ${ANDROID_HOME}/tmp/
 RUN set -eux; \
     if [ -d "${ANDROID_HOME}/tmp" ] && [ "$(ls -A ${ANDROID_HOME}/tmp)" ]; then \
         #cmdline-tools
