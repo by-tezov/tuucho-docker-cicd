@@ -14,3 +14,15 @@ ffmpeg -i input.flv -c copy output.mp4
 sudo -i
 cd /home/tezov/Local/by-tezov/cicd
 bash command-jenkins-backup.bash
+
+# gradle setup pre downloaded (not required)
+
+# little bit strange, but I don't remember why I did like this :S
+# zip (should be inside .gradle/dists) -> tar (add -bin in name) -> split (remove .tar.gz)
+
+# sample with 9.3.1
+zip -r gradle-9.3.1.zip gradle-9.3.1
+tar -czf gradle-9.3.1-bin.zip.tar.gz gradle-9.3.1.zip
+split -b 30M gradle-9.3.1-bin.zip.tar.gz gradle-9.3.1-bin.zip.part.
+# then put inside setup/gradle/gradle-9.3.1-bin/hash_key
+
