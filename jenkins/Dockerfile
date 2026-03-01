@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.528.3-lts-jdk21
+FROM jenkins/jenkins:2.541.2-lts-jdk21
 
 LABEL owner="tezov.app@gmail.com"
 
