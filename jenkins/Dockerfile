@@ -14,11 +14,10 @@ ENV COMMAND_HOME=${USER_HOME}/command
 ENV JENKINS_SSH=${USER_HOME}/.ssh
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping socat tree \
-    curl && \
+    dos2unix procps iputils-ping socat tree wget curl && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY jenkins/setup/backup ${JENKINS_HOME}/tmp
+COPY jenkins/setup/backup/last/ ${JENKINS_HOME}/tmp/
 RUN cat ${JENKINS_HOME}/tmp/jenkins.tar.part.* > ${JENKINS_HOME}/tmp/jenkins.tar.gz && \
     tar -xzf ${JENKINS_HOME}/tmp/jenkins.tar.gz -C ${JENKINS_HOME}/ --strip-components=1 && \
     rm -rf ${JENKINS_HOME}/tmp
@@ -40,8 +39,9 @@ COPY jenkins/setup/helper/ ${JENKINS_HELPER_FILES}/
 RUN chown -R jenkins:jenkins ${USER_HOME} && \ 
     chown -R jenkins:jenkins ${JENKINS_HOME}
 
-USER jenkins
 RUN git config --global user.name "tezov.jenkins" && \
     git config --global user.email "tezov.app@gmail.com"
+
+USER jenkins
 WORKDIR ${JENKINS_HOME}
 ENTRYPOINT ["/usr/local/bin/jenkins.sh"]

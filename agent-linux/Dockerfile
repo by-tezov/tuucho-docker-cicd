@@ -21,8 +21,7 @@ RUN printf "JAVA_HOME=%s\nPATH=%s\n" \
 "$JAVA_HOME" "$PATH" >> /etc/environment
 
 RUN apt-get update && apt-get install -y \
-    dos2unix procps iputils-ping tree \
-    wget curl jq \
+    dos2unix procps iputils-ping tree wget curl jq \
     unzip zip xz-utils git bash openssh-server openssh-client && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 

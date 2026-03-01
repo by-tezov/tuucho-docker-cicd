@@ -20,14 +20,14 @@ ENV ANDROID_SDK=${ANDROID_HOME}
 ENV PATH=${PATH}:${JAVA_HOME}/bin:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/build-tools/${BUILD_TOOLS_VERSION}
 
 RUN apt-get update && apt-get install -y \
-    procps iputils-ping tree \
-    openjdk-17-jdk wget curl jq \
+    procps iputils-ping tree  wget curl jq \
+    openjdk-17-jdk \
     unzip zip bash && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 #RUN echo "Java path: $(readlink -f $(which java))"
 
-COPY setup/android/ ${ANDROID_HOME}/tmp/
+COPY setup/android/last/ ${ANDROID_HOME}/tmp/
 RUN set -eux; \
     if [ -d "${ANDROID_HOME}/tmp" ] && [ "$(ls -A ${ANDROID_HOME}/tmp)" ]; then \
         #cmdline-tools
